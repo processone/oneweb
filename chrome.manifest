@@ -1,0 +1,3 @@
+content  oneweb                   file:content/
+locale   oneweb  en-US            file:locale/en-US/
+skin     oneweb classic/1.0       file:skin/default/
