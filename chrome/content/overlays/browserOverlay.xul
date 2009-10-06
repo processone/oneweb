@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://oneweb/skin/browserUI/browserUI.css" type="text/css"?>
+
+<overlay id="onewebBrowserOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script><![CDATA[
+    var OneWeb = {
+      onStatusClick: function() {
+
+      },
+
+      onBookmarksChanged: function(data) {
+      },
+
+      onGlobalMessageChanged: function(data) {
+        var si = document.getElementById("oneweb-status");
+
+        si.setAttribute("label", data ? data.message : "");
+        si.setAttribute("messageType", data ? data.type : "");
+      }
+    }
+  ]]></script>
+
+  <statusbar id="status-bar">
+    <tooltip id="oneweb-default-tooltip">
+      <label value="OneWeb"/>
+    </tooltip>
+
+    <tooltip id="oneweb-messages-tooltip"/>
+
+    <statusbarpanel id="oneweb-status" class="statusbarpanel-iconic-text"
+                    onclick="OneWeb.onStatusClick(event)"
+                    tooltip="oneweb-default-tooltip"/>
+  </statusbar>
+
+</overlay>

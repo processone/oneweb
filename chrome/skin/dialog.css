@@ -1,0 +1,24 @@
+.field-desc {
+  font-size: smaller;
+  font-style: italic;
+}
+
+spacer {
+  height: 0.8em;
+}
+
+hbox.entry {
+  -moz-box-align: center;
+}
+
+row {
+  -moz-box-align: center;
+}
+
+hbox.entry > *:last-child {
+  -moz-box-flex: 1;
+}
+
+richlistitem:nth-child(2n+1):not([selected=true]) {
+  background-color: -moz-oddtreerow;
+}

@@ -1,0 +1,49 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+textbox[type="verifiable"] {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#textbox");
+}
+
+ifvalid {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#ifvalid");
+}
+
+ifinvalid {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#ifvalid");
+}
+
+verifier {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#verifier");
+}
+
+verifier-error-box {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#error-box");
+}
+
+dialog {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#dialog") !important;
+}
+
+window:not(.no-verifier) {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#window") !important;
+}
+
+wizard {
+  -moz-binding: url("chrome://oneweb/content/bindings/verifier.xml#wizard") !important;
+}
+
+listeditor {
+  -moz-binding: url("chrome://oneweb/content/bindings/listeditor.xml#list-editor");
+}
+
+registrationform {
+  -moz-binding: url("chrome://oneweb/content/bindings/forms.xml#registration-form");
+}
+
+searchform {
+  -moz-binding: url("chrome://oneweb/content/bindings/forms.xml#search-form");
+}
+
+expander {
+  -moz-binding: url("chrome://oneweb/content/bindings/expander.xml#expander");
+}

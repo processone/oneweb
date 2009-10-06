@@ -1,0 +1,61 @@
+body {
+    background: white;
+    font-family: sans-serif;
+    margin: 2px;
+    padding: 2px;
+}
+
+.exec-flags > span {
+    font-size: 75%;
+    -moz-border-radius: 10px;
+    background: red;
+    color: white;
+    padding: 0 4px;
+}
+
+.exec-unit {
+    display: block;
+    border: 1px solid #ccc;
+    padding: 2px 4px;
+    margin: 2px 0;
+}
+
+.exec-expr {
+    border-bottom: 1px dotted #eee;
+}
+
+.exec-unit.exception {
+    background: #ffd;
+}
+
+.value-object {
+    color: #116;
+}
+
+.value-array {
+    color: #229;
+}
+
+.value-string {
+    color: #e33;
+}
+
+.value-number {
+    color: #44f;
+}
+
+.value-boolean {
+    color: #e2e;
+}
+
+.value-xml {
+    color: #383;
+}
+
+.value-function {
+    color: #416;
+}
+
+.value-continue {
+    color: #000;
+}

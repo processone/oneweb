@@ -1,0 +1,602 @@
+<?xml version="1.0"?>
+
+<bindings xmlns="http://www.mozilla.org/xbl"
+  xmlns:xbl="http://www.mozilla.org/xbl"
+  xmlns:html="http://www.w3.org/1999/xhtml"
+  xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <binding id="textbox" extends="chrome://global/content/bindings/textbox.xml#textbox">
+    <resources>
+      <stylesheet src="chrome://global/skin/textbox.css"/>
+      <stylesheet src="chrome://oneweb/skin/verifier/verifier.css"/>
+    </resources>
+
+    <content>
+      <xul:hbox class="textbox-input-box" flex="1" xbl:inherits="context" align="center">
+        <html:input class="textbox-input" flex="1" anonid="input"
+          xbl:inherits="type=internaltype,onfocus,onblur,value,maxlength,disabled,size,
+          readonly,tabindex,accesskey"/>
+        <xul:image class="verifier-state-image" valid="false" hidden="true"
+          xbl:inherits="tooltiptext=errortext"/>
+      </xul:hbox>
+    </content>
+
+    <implementation>
+      <constructor><![CDATA[
+        this._image = document.getAnonymousElementByAttribute(this, "class", "verifier-state-image");
+        this._timer = setTimeout(function(me){me._checkCondition()}, 50, this);
+        this._valid = false;
+        this._active = false;
+
+        var p = this.__proto__;
+        this.__proto__ = {};
+
+        var state = {};
+        for each (var i in "value disabled regex condition".split(/ /))
+          if (this[i] != null) {
+            state[i] = this[i];
+            delete this[i];
+          }
+
+        this.__proto__ = p;
+
+        for (i in state)
+          this[i] = state[i];
+
+        var p = this.parentNode;
+        while (p && !p.registerVerifiable)
+          p = p.parentNode;
+
+        if (!(this._verifier = p) && window.document.documentElement.registerVerifiable)
+          this._verifier = window.document.documentElement;
+      ]]></constructor>
+
+      <destructor><![CDATA[
+        if (this._timer)
+          clearTimeout(this._timer);
+
+        if (this._conditionFun)
+          this._verifier.unregisterVerifiable(this);
+      ]]></destructor>
+
+      <property name="regex" onget="return this.getAttribute('regex')"
+                onset="this.setAttribute('regex', val); return val"/>
+      <property name="condition" onget="return this.getAttribute('condition')"
+                onset="this.setAttribute('condition', val); return val"/>
+      <property name="isValid" onget="return !this._active || !!this._valid"
+                readonly="true"/>
+      <property name="value" onget="return this.inputField.value"
+                onset="this.inputField.value = val; this._checkCondition(); return val"/>
+
+      <method name="_checkCondition">
+        <body><![CDATA[
+          if (!this._verifier)
+            return;
+          if (this._timer != null) {
+            clearTimeout(this._timer);
+            this._timer = null;
+          }
+          if (!this._conditionFun)
+            this._verifier.registerVerifiable(this);
+
+          if (this.condition) {
+            this._regex = null;
+            if (this._condition != this.condition) {
+              this._condition = this.condition;
+              try {
+                this._conditionFun = eval("var f; f=function(val){try{return !!("+
+                                          this._condition+")}catch(e){return false}}");
+              } catch(e) {
+                this._conditionFun = function(){return false};
+              }
+            }
+          } else if (this.regex) {
+            this._condition = null;
+            if (this._regex != this.regex) {
+              this._regex = this.regex;
+              try {
+                this._conditionFun = new RegExp(this._regex);
+              } catch(e) {
+                this._conditionFun = function(){return false};
+              }
+            }
+          } else
+            this._conditionFun = function(){return true};
+
+          var wasValid = this.isValid;
+          this._active = !!(this.boxObject.width > 0 && !this.inputField.disabled &&
+            (this._condition || this._regex));
+          this._valid = !!this._conditionFun(this.value);
+
+          if (this.isValid != wasValid)
+            if (wasValid)
+              this._verifier.verificationFailed(this);
+            else
+              this._verifier.verificationSucceeded(this);
+          this._image.hidden = !this._active;
+          this._image.setAttribute("valid", this.isValid ? "true" : "false");
+        ]]></body>
+      </method>
+    </implementation>
+
+    <handlers>
+      <handler event="DOMAttrModified"><![CDATA[
+        if (event.target == event.currentTarget &&
+            (event.attrName == "hidden" || event.attrName == "collapsed" ||
+             event.attrName == "regex" || event.attrName == "condition" ||
+             event.attrName == "disabled"))
+          this._checkCondition();
+      ]]></handler>
+
+      <handler event="input"><![CDATA[
+        if (!this._verifier)
+          return;
+        if (this._timer)
+          clearTimeout(this._timer);
+        this._timer = setTimeout(function(me){me._checkCondition()}, 50, this);
+      ]]></handler>
+
+      <handler event="keypress" keycode="VK_RETURN"><![CDATA[
+        if (!this._verifier)
+          return;
+        this._checkCondition();
+        event.preventDefault();
+      ]]></handler>
+
+      <handler event="focus" phase="capturing"><![CDATA[
+        if (!this._verifier)
+          return;
+        window.document.documentElement._updateErrorBox(this, true);
+      ]]></handler>
+
+      <handler event="blur" phase="capturing"><![CDATA[
+        if (!this._verifier)
+          return;
+        window.document.documentElement._updateErrorBox(this, false);
+      ]]></handler>
+    </handlers>
+  </binding>
+
+  <binding id="ifvalid">
+    <content>
+      <xul:vbox class="box-inherit" xbl:inherits="align,dir,pack,orient">
+        <children/>
+      </xul:vbox>
+    </content>
+  </binding>
+
+  <binding id="error-box">
+    <resources>
+      <stylesheet src="chrome://oneweb/skin/verifier/verifier.css"/>
+    </resources>
+    <content>
+      <xul:stack flex="1">
+        <xul:vbox>
+          <children/>
+        </xul:vbox>
+        <xul:vbox anonid="errorBox" mousethrough="always"
+                  collapsed="true" class="verifier-error-box">
+          <xul:hbox align="center">
+            <xul:image/>
+            <xul:description anonid="errorText" flex="1"/>
+          </xul:hbox>
+        </xul:vbox>
+      </xul:stack>
+    </content>
+
+    <implementation>
+      <constructor><![CDATA[
+        this._errorBox = document.getAnonymousElementByAttribute(this, "anonid", "errorBox");
+        this._errorText = document.getAnonymousElementByAttribute(this, "anonid", "errorText");
+      ]]></constructor>
+
+      <method name="_updateErrorBox">
+        <parameter name="textbox"/>
+        <parameter name="focus"/>
+        <body><![CDATA[
+          if (focus == null) {
+            if (this._focused != textbox)
+              return;
+          } else
+            this._focused = focus ? textbox : null;
+
+          if (!this._focused || !(textbox.errortext || textbox.getAttribute("errortext")) || textbox.isValid)
+            return this._errorBox.collapsed = true;
+
+          if (this._errorText.firstChild)
+            this._errorText.removeChild(this._errorText.firstChild);
+          this._errorText.appendChild(this._errorText.ownerDocument.
+                                      createTextNode(textbox.errortext || textbox.getAttribute("errortext")));
+
+          this._errorBox.collapsed = false;
+
+          var pos = textbox.boxObject.y -
+            this._errorBox.firstChild.boxObject.height -
+            this._errorBox.boxObject.y - 8;
+
+          if (pos < 0)
+            pos = textbox.boxObject.y + textbox.boxObject.height -
+              this._errorBox.boxObject.y - 4;
+
+          this._errorBox.style.marginLeft = (textbox.boxObject.x+8)+"px";
+          this._errorBox.style.marginRight = (window.innerWidth-textbox.boxObject.x-
+                                              textbox.boxObject.width+12)+"px";
+          this._errorBox.style.paddingTop = pos+"px";
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+
+  <binding id="verifier">
+    <content class="box-inherit">
+      <xul:vbox class="box-inherit" flex="1" xbl:inherits="orient,align,pack,dir">
+        <children/>
+      </xul:vbox>
+    </content>
+
+    <implementation>
+      <property name="isValid" onget="return this._failedCount == 0" readonly="true"/>
+
+      <constructor><![CDATA[
+        this._verifiables = [];
+        this._failedCount = 0;
+      ]]></constructor>
+
+      <method name="registerVerifiable">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifiables.push(verifiable);
+          if (!verifiable.isValid)
+            this.verificationFailed(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="unregisterVerifiable">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          var idx = this._verifiables.indexOf(verifiable)
+          if (idx < 0)
+            return;
+
+          if (!verifiable.isValid)
+            this.verificationSucceeded(verifiable);
+
+          this._verifiables.splice(idx, 1);
+        ]]></body>
+      </method>
+
+      <method name="unregisterVerifiables">
+        <parameter name="tree"/>
+        <body><![CDATA[
+          var idx = this._verifiables.indexOf(tree)
+
+          if (idx >= 0) {
+            this.unregisterVerifiable(tree);
+            return;
+          }
+
+          for (var i = 0; i < tree.childNodes.length; i++)
+            if (tree.childNodes[i].nodeType == tree.ELEMENT_NODE)
+              this.unregisterVerifiables(tree.childNodes[i]);
+        ]]></body>
+      </method>
+
+      <method name="verificationSucceeded">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          window.document.documentElement._updateErrorBox(verifiable);
+
+          this._failedCount--;
+          if (this._failedCount == 0)
+            this._updateInvalidState(false);
+        ]]></body>
+      </method>
+
+      <method name="verificationFailed">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          window.document.documentElement._updateErrorBox(verifiable);
+
+          this._failedCount++;
+          if (this._failedCount == 1)
+            this._updateInvalidState(true);
+        ]]></body>
+      </method>
+
+      <method name="focusInvalidWidget">
+        <body><![CDATA[
+          for (var i = 0; i < this._verifiables.length; i++)
+            if (!this._verifiables[i].isValid) {
+              setTimeout(function(a){a.focus()}, 0, this._verifiables[i]);
+              return;
+            }
+        ]]></body>
+      </method>
+
+      <method name="_updateInvalidState">
+        <parameter name="inInvalidState"/>
+        <body><![CDATA[
+          var iter = this.ownerDocument.
+            createTreeWalker(this._childContainer || this, NodeFilter.SHOW_ELEMENT, function(el) {
+                if (el.localName == "verifier")
+                  return NodeFilter.FILTER_REJECT;
+                if (el.hasAttribute("ifvalidset") || el.hasAttribute("ifinvalidset") ||
+                    el.localName == "ifvalid" || el.localName == "ifinvalid")
+                  return NodeFilter.FILTER_ACCEPT;
+                return NodeFilter.FILTER_SKIP;
+              }, true);
+
+          while (iter.nextNode()) {
+            var el = iter.currentNode;
+            var validset = el.getAttribute("ifvalidset");
+            var invalidset = el.getAttribute("ifinvalidset");
+
+            if (el._verifier_ifvalidset_cache != validset ||
+                el._verifier_ifinvalidset_cache != invalidset)
+            {
+              var validFun = "", invalidFun = "";
+              validset = validset ? validset.split(/\s*,\s*/) : [];
+              invalidset = invalidset ? invalidset.split(/\s*,\s*/) : [];
+
+              for (var i = 0; i < validset.length; i++) {
+                var ins = validset[i].match(/\s*(@)?(\S+?)\s*=\s*(\S+?)\s*(?::\s*(\S+))?\s*$/);
+                validFun += this._genStateFun(ins[1], ins[2], ins[3]);
+                invalidFun += this._genStateFun(ins[1], ins[2], ins[4]);
+              }
+
+              for (i = 0; i < invalidset.length; i++) {
+                ins = invalidset[i].match(/\s*(@)?(\S+?)\s*=\s*(\S+?)\s*(?::\s*(\S+))?\s*$/);
+                invalidFun += this._genStateFun(ins[1], ins[2], ins[3]);
+                validFun += this._genStateFun(ins[1], ins[2], ins[4]);
+              }
+
+              el._verifier_ifvalidset_cache = validset;
+              el._verifier_ifinvalidset_cache = invalidset;
+              try {
+                el._verifier_valid_fun = new Function("", validFun);
+                el._verifier_invalid_fun = new Function("", invalidFun);
+              } catch(ex) {
+                el._verifier_valid_fun = function(){};
+                el._verifier_invalid_fun = function(){};
+              }
+            }
+            if (inInvalidState)
+              el._verifier_invalid_fun();
+            else
+              el._verifier_valid_fun();
+
+            if (el.localName == "ifvalid")
+              el.collapsed = !!inInvalidState;
+            else if (el.localName == "ifinvalid")
+              el.collapsed = !inInvalidState;
+          }
+
+          var attr = inInvalidState ? "oninvalid" : "onvalid";
+          var call = this.getAttribute(attr);
+          if (call)
+            try {
+              (function(attr){eval(call)}).call(this, attr);
+            } catch (ex){}
+        ]]></body>
+      </method>
+
+      <method name="_genStateFun">
+        <parameter name="attrib"/>
+        <parameter name="name"/>
+        <parameter name="value"/>
+        <body><![CDATA[
+          if (attrib)
+            return (value == null ? "this.removeAttribute(" : "this.setAttribute(")+
+              uneval(name) + (value == null ? ");" : ","+value+");");
+
+          return (value == null ? "delete this[" : "this[")+
+            uneval(name) + (value == null ? "];" : "]="+value+";");
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+
+  <binding id="window">
+    <content>
+      <xul:verifier-error-box flex="1">
+        <xul:vbox class="box-inherit" flex="1">
+          <children/>
+        </xul:vbox>
+      </xul:verifier-error-box>
+    </content>
+
+    <implementation>
+      <constructor><![CDATA[
+        this._errorBox = document.getAnonymousNodes(this)[0];
+      ]]></constructor>
+
+      <method name="_updateErrorBox">
+        <parameter name="textbox"/>
+        <parameter name="focus"/>
+        <body><![CDATA[
+          this._errorBox._updateErrorBox(textbox, focus);
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+
+  <binding id="dialog" extends="chrome://global/content/bindings/dialog.xml#dialog">
+    <content>
+      <xul:verifier-error-box flex="1">
+        <xul:verifier flex="1" orient="vertical"
+            oninvalid="this.parentNode.parentNode.getButton('accept').disabled = true"
+            onvalid="this.parentNode.parentNode.getButton('accept').disabled = false">
+          <xul:vbox class="dialog-content-box" flex="1">
+            <children/>
+          </xul:vbox>
+
+          <xul:hbox class="dialog-button-box" anonid="buttons"
+                    xbl:inherits="pack=buttonpack,align=buttonalign,dir=buttondir,orient=buttonorient"
+                    pack="end">
+            <xul:button dlgtype="extra2" class="dialog-button" hidden="true"/>
+            <xul:spacer anonid="spacer" flex="1" hidden="true"/>
+            <xul:button dlgtype="accept" class="dialog-button" xbl:inherits="disabled=buttondisabledaccept"/>
+            <xul:button dlgtype="extra1" class="dialog-button" hidden="true"/>
+            <xul:button dlgtype="cancel" class="dialog-button"/>
+            <xul:button dlgtype="help" class="dialog-button" hidden="true"/>
+            <xul:button dlgtype="disclosure" class="dialog-button" hidden="true"/>
+          </xul:hbox>
+        </xul:verifier>
+      </xul:verifier-error-box>
+    </content>
+
+    <implementation>
+      <property name="isValid" onget="return this._verifier.isValid" readonly="true"/>
+
+      <constructor><![CDATA[
+        if (/Mac|Linux/.test(window.navigator.platform)) {
+          var b = document.getAnonymousElementByAttribute(this, "anonid", "buttons");
+          b.removeAttribute("pack");
+          b.appendChild(b.childNodes[5]);
+          b.appendChild(b.childNodes[0]);
+          b.appendChild(b.childNodes[2]);
+          b.appendChild(b.childNodes[0]).removeAttribute("hidden");
+          b.appendChild(b.childNodes[1]);
+          b.appendChild(b.childNodes[0]);
+          try {
+            this.buttons = this.buttons;
+          } catch(ex){}
+        }
+
+        this._errorBox = document.getAnonymousNodes(this)[0];
+        this._verifier = this._errorBox.firstChild;
+        this._verifier._childContainer = this;
+      ]]></constructor>
+
+      <method name="registerVerifiable">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.registerVerifiable(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="unregisterVerifiable">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.unregisterVerifiable(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="unregisterVerifiables">
+        <parameter name="tree"/>
+        <body><![CDATA[
+          this._verifier.unregisterVerifiables(tree);
+        ]]></body>
+      </method>
+
+      <method name="verificationSucceeded">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.verificationSucceeded(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="verificationFailed">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.verificationFailed(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="focusInvalidWidget">
+        <body><![CDATA[
+          this._verifier.focusInvalidWidget();
+        ]]></body>
+      </method>
+
+      <method name="_updateErrorBox">
+        <parameter name="textbox"/>
+        <parameter name="focus"/>
+        <body><![CDATA[
+          this._errorBox._updateErrorBox(textbox, focus);
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+
+  <binding id="wizard" extends="chrome://global/content/bindings/wizard.xml#wizard">
+    <content>
+      <xul:verifier-error-box flex="1">
+        <xul:verifier flex="1" orient="vertical"
+            oninvalid="this.parentNode.parentNode.canAdvance = this.parentNode.parentNode.canAdvance"
+            onvalid="this.parentNode.parentNode.canAdvance = this.parentNode.parentNode.canAdvance">
+          <xul:hbox class="wizard-header" anonid="Header"/>
+
+          <xul:deck class="wizard-page-box" flex="1" anonid="Deck">
+            <children includes="wizardpage"/>
+          </xul:deck>
+          <children/>
+
+          <xul:hbox class="wizard-buttons" anonid="Buttons" xbl:inherits="pagestep,firstpage,lastpage"/>
+        </xul:verifier>
+      </xul:verifier-error-box>
+    </content>
+
+    <implementation>
+      <property name="canAdvance" onget="return this._canAdvance;"
+                onset="this._nextButton.disabled = !this.isValid || !val; return this._canAdvance = val;"/>
+
+      <property name="isValid" onget="return this._verifier ? this._verifier.isValid : true" readonly="true"/>
+
+      <constructor><![CDATA[
+        this._errorBox = document.getAnonymousNodes(this)[0];
+        this._verifier = this._errorBox.firstChild;
+        this._verifier._childContainer = this;
+      ]]></constructor>
+
+      <method name="registerVerifiable">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.registerVerifiable(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="unregisterVerifiable">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.unregisterVerifiable(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="unregisterVerifiables">
+        <parameter name="tree"/>
+        <body><![CDATA[
+          this._verifier.unregisterVerifiables(tree);
+        ]]></body>
+      </method>
+
+      <method name="verificationSucceeded">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.verificationSucceeded(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="verificationFailed">
+        <parameter name="verifiable"/>
+        <body><![CDATA[
+          this._verifier.verificationFailed(verifiable);
+        ]]></body>
+      </method>
+
+      <method name="focusInvalidWidget">
+        <body><![CDATA[
+          this._verifier.focusInvalidWidget();
+        ]]></body>
+      </method>
+
+      <method name="_updateErrorBox">
+        <parameter name="textbox"/>
+        <parameter name="focus"/>
+        <body><![CDATA[
+          this._errorBox._updateErrorBox(textbox, focus);
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+</bindings>

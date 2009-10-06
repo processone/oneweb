@@ -1,3 +1,4 @@
-content  oneweb                   file:content/
-locale   oneweb  en-US            file:locale/en-US/
-skin     oneweb classic/1.0       file:skin/default/
+content  oneweb                   file:chrome/content/
+locale   oneweb  en-US            file:chrome/locale/en-US/
+skin     oneweb classic/1.0       file:chrome/skin/
+overlay  chrome://browser/content/browser.xul chrome://oneweb/content/overlays/browserOverlay.xul
