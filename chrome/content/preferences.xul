@@ -128,7 +128,7 @@
                        type="verifiable" internaltype="password"
                        regex="."
                        errortext="Password can't be empty"
-                       prefSet="this.value = account.connectionInfo.pass"
+                       prefSet="this.value = account.connectionInfo.pass || ''"
                        prefGet=""/>
             </row>
           </rows>
