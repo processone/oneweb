@@ -350,6 +350,7 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         }
 
         this.connectionInfo.pass = pass;
+        this.modelUpdated("connectionInfo");
     },
 
     connect: function()
