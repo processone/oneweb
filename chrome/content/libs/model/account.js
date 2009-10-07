@@ -14,6 +14,7 @@ ML.importMod("prefs.js");
 ML.importMod("services/manager.js");
 ML.importMod("services/adhoc.js");
 ML.importMod("services/pep.js");
+ML.importMod("services/bookmarksSharing.js");
 
 var XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 var HTMLNS = "http://www.w3.org/1999/xhtml";
@@ -475,7 +476,7 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         // means that we attempted connection but did not manage
         // to.
         if(!this.connected)
-            this.loginErrorMsgToken = this.setGlobalMessage("logginError", _("Loggin Error"), 100);
+            this.loginErrorMsgToken = this.setGlobalMessage("logginError", _("Loggin Error"), 300);
 
         this.connected = false;
         this.connectionInitialized = false;

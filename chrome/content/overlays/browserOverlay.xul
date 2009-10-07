@@ -8,16 +8,22 @@
   <script><![CDATA[
     var OneWeb = {
       onStatusClick: function() {
-
+        openDialog("chrome://oneweb/content/bookmarks.xul", "_blank",
+                   "resizable=yes,chrome=yes,dialog=no", this.bookmarks || [],
+                   this.newBookmarks || []);
+        this.cleanCallback();
       },
 
-      onBookmarksChanged: function(data) {
+      onBookmarksChanged: function(bookmarks, newBookmarks, numNew, cleanCallback) {
+        this.bookmarks = bookmarks;
+        this.newBookmarks = newBookmarks;
+        this.cleanCallback = cleanCallback;
       },
 
       onGlobalMessageChanged: function(data) {
         var si = document.getElementById("oneweb-status");
 
-        si.setAttribute("label", data ? data.message : "");
+        si.setAttribute("label", data ? data.message : "OneWeb");
         si.setAttribute("messageType", data ? data.type : "");
       }
     }

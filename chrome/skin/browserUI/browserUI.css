@@ -1,0 +1,12 @@
+#oneweb-status {
+  list-style-image: url(imgs/default-icon.png);
+}
+
+#oneweb-status[messageType=loginError] {
+  list-style-image: url(imgs/error-icon.png);
+  color: red;
+}
+
+#oneweb-status[messageType=newBookmarks] {
+  list-style-image: url(imgs/new-bookmarks-icon.png);
+}

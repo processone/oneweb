@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://oneweb/skin/bookmarks/bookmarks.css" type="text/css"?>
+
+<?xul-overlay href="chrome://oneteam/content/overlays/macMenuOverlay.xul"?>
+
+<window id="ow:bookmarks" title="Shared Bookmarks" width="700" height="600"
+    onload="onLoad()" windowtype="ow:bookmarks"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="text/javascript;version=1.7" src="libs/moduleloader.js"/>
+  <script type="text/javascript;version=1.7"><![CDATA[
+    [bookmarks, newBookmarks, newCount] = window.arguments;
+
+    ML.importMod("model/account.js");
+    ML.importMod("dateutils.js");
+
+    function genBookmarksView(bookmarks, top) {
+      var html = "";
+      for (var i = 0; i < bookmarks.length; i++) {
+        html += "<div class='block'>"+
+          "<div class='from'>Bookmarks sent by <span class='from-val'>"+
+          xmlEscape(bookmarks[i].from)+"</span></div><ul>";
+        for (var j = 0; j < bookmarks[i].bookmarks.length; j++) {
+          var b = bookmarks[i].bookmarks[j];
+          html += "<li><a href='"+xmlEscape(b.url)+"'>"+
+            xmlEscape(b.title)+"</a> - <span class='date'>"+
+            readableTimestamp(b.date)+"</span></li>";
+        }
+        html += "</ul></div>"
+      }
+
+      var div = document.createElementNS(HTMLNS, "div");
+      div.innerHTML = html;
+
+      top.appendChild(div);
+    }
+
+    function onLoad() {
+      document.addEventListener("click", linkEventsRedirector, true);
+      genBookmarksView(newBookmarks, document.getElementById("newBookmarks"));
+      genBookmarksView(bookmarks, document.getElementById("allBookmarks"));
+      if (!newBookmarks.length)
+        document.getElementById("tabbox").selectedIndex = 1;
+    }
+  ]]></script>
+
+  <group id="macMenu"/>
+
+  <toolbox id="mainToolbox">
+    <menubar id="macMenuBar"/>
+  </toolbox>
+
+  <tabbox flex="1" id="tabbox">
+    <tabs style="-moz-appearance: -moz-mac-unified-toolbar;">
+      <tab id="connection" label="New Bookmarks"/>
+      <tab id="status" label="All Bookmarks"/>
+    </tabs>
+    <tabpanels flex="1">
+      <tabpanel>
+        <description id="newBookmarks"/>
+      </tabpanel>
+      <tabpanel>
+        <description id="allBookmarks"/>
+      </tabpanel>
+    </tabpanels>
+  </tabbox>
+</window>

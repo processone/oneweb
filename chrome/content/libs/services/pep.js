@@ -14,33 +14,62 @@ _DECL_(PEPNodeHandler).prototype = {
      * @param delta Object - Hash with attribute name as property, and new
      *   value as hash value
      */
-    reconfigureNode: function(delta) {
+
+    getConfiguration: function(callback, force) {
+        if (this._configuration && !force) {
+            if (callback)
+                callback(this._configuration);
+            return this._configuration;
+        }
+
         servicesManager.sendIqWithGenerator(
-            (function (delta) {
+            (function (callback) {
                 [pkt, query, queryDOM] = yield {
                     type: "get",
                     domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
                                  [["configure", {node: this._node}]]]
                 };
 
-                if (pkt.getType() != "result")
-                    yield null;
+                if (pkt.getType() == "result") {
+                    var ns1 = new Namespace("http://jabber.org/protocol/pubsub#owner");
+                    var ns2 = new Namespace("jabber:x:data");
 
+                    this._configuration = {};
+
+                    for each (var field in query.ns1::configure.ns2::x.ns2::field)
+                        this._configuration[filed.@var] = field.ns2::value.text().toString();
+                } else
+                    this._configuration = null;
+
+                if (callback)
+                    callback(this._configuration);
+
+                yield null;
+            }).call(this, callback));
+
+        return this._configuration;
+    },
+
+    reconfigureNode: function(delta, callback) {
+        servicesManager.sendIqWithGenerator(
+            (function (delta) {
                 var fields = [];
-                var ns1 = new Namespace("http://jabber.org/protocol/pubsub#owner");
-                var ns2 = new Namespace("jabber:x:data");
 
-                for each (var field in query.ns1::configure.ns2::x.ns2::field)
-                    if (field.@var in delta)
-                        fields.push(["field", {"var": field.@var},
-                                     [["value", {}, [delta[field.@var] || field.ns2::value.text()+""]]]]);
+                delta["FORM_TYPE"] = "http://jabber.org/protocol/pubsub#node_config";
+                for (var v in delta)
+                    fields.push(["field", {"var": v}, [["value", {}, [delta[v]]]]]);
 
-                yield {
+                [pkt, query, queryDOM] = yield {
                     type: "set",
                     domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
                                  [["configure", {node: this._node},
                                    [["x", {xmlns: "jabber:x:data", type: "submit"}, fields]]]]]
                 };
+
+                if (callback)
+                    callback(pkt.getType() == "result");
+
+                yield null;
             }).call(this, delta));
     },
 
@@ -50,9 +79,9 @@ _DECL_(PEPNodeHandler).prototype = {
 
         pkt.setType('set');
 
-        pkt.appendNode("pubsub", {xmlns: ns}, 
+        pkt.appendNode("pubsub", {xmlns: ns},
                        [["publish", {node: this._node},
-                         [["item", id ? {xmlns:ns, id: id} : {xmlns:ns}, data]]]]);
+                         [["item", id ? {id: id} : {}, data]]]]);
 
         account.connection.send(pkt);
     },
@@ -63,9 +92,9 @@ _DECL_(PEPNodeHandler).prototype = {
 
         pkt.setType('set');
 
-        pkt.appendNode("retract", {xmlns: ns, node: this._node}, [
-            ["item", {xmlns: ns, id: id}, data]
-        ])
+        pkt.appendNode("pubsub", {xmlns: ns},
+                       [["retract", {node: this._node},
+                         [["item", {id: id}, []]]]]);
 
         account.connection.send(pkt);
     }
@@ -91,8 +120,10 @@ var pepService = {
         if (!this._observers[items.@node])
             return;
 
-        var data = {added: items.pepNS::item, removed: []};
+        var data = {added: [], removed: []};
 
+        for each (var item in items.pepNS::item)
+            data.added.push(item)
         for each (var item in items.pepNS::retract)
             data.removed.push(item.@id.toString())
 

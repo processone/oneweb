@@ -252,6 +252,8 @@ _DECL_(ServicesManager).prototype =
                 return;
         }
 
+        return;
+
         var item;
         if (from.resource) {
             item = account.getOrCreateResource(from);
@@ -347,5 +349,4 @@ servicesManager.publishDiscoInfo("http://jabber.org/protocol/disco#info");
 servicesManager.publishDiscoInfo("http://jabber.org/protocol/muc");
 servicesManager.publishDiscoInfo("jabber:x:conference");
 servicesManager.publishDiscoInfo("http://jabber.org/protocol/chatstates");
-servicesManager.publishDiscoInfo("http://jabber.org/protocol/xhtml-im");
 servicesManager.publishDiscoInfo("http://jabber.org/protocol/xhtml-im");
