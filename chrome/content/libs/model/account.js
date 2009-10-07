@@ -257,10 +257,10 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         var token = {type: type, message: message, priority: priority};
 
         for (var i = 0; i < this.globalMessages.length; i++)
-            if (this.globalMessages.priority < priority)
+            if (this.globalMessages[i].priority < priority)
                 break;
 
-        this.globalMessages.splice(i, token);
+        this.globalMessages.splice(i, 0, token);
 
         if (i > 0)
             return token;
@@ -276,7 +276,8 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         var idx = this.globalMessages.indexOf(token);
         if (idx < 0)
             return;
-        this.globalMessages.splice(idx, token);
+
+        this.globalMessages.splice(idx, 1);
 
         if (idx > 0)
             return;
