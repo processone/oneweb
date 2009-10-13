@@ -127,7 +127,7 @@ var pepService = {
         for each (var item in items.pepNS::retract)
             data.removed.push(item.@id.toString())
 
-        this._observers[items.@node]._callback.call(null, jid, items.@node.toString(), data);
+        this._observers[items.@node]._callback.call(null, jid, items.@node.toString(), data, pkt);
     }
 };
 

@@ -60,11 +60,13 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         this.modelUpdated("newBookmarks", changes);
     },
 
-    _onPEPEvent: function(from, node, data) {
+    _onPEPEvent: function(from, node, data, pkt) {
         var jid = from.normalizedJID.shortJID;
 
         if (jid == account.myJID.normalizedJID.shortJID)
             return 2;
+
+        dump("PEPEVENT: "+uneval(data)+"\n");
 
         var changes = {added: [], removed: []};
 
