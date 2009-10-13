@@ -177,8 +177,10 @@ servicesManager.addIQService("http://jabber.org/protocol/commands", function (pk
 
     var permission = account.permissions[node.toLowerCase()] || 0;
 
-    if (!(permission == 0 && jid.normalizedJID.shortJID == account.myJID.normalizedJID.shortJID ||
-          permission == 1 && account.contacts[jid.normalizedJID.shortJID]))
+    var shortJID = jid.normalizedJID.shortJID;
+
+    if (!(permission == 2 || shortJID == account.myJID.normalizedJID.shortJID||
+          permission == 1 && account.contacts[shortJID]))
         return {
             type: "error",
             dom: queryDOM,
