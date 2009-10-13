@@ -109,6 +109,26 @@ _DECL_(ServicesManager).prototype =
             account.setPresence(account.currentPresence);
     },
 
+    unpublishDiscoInfo: function(ns, nodes) {
+        nodes = nodes instanceof Array ? nodes : nodes == null ? [] : [nodes];
+
+        if (nodes.length == 0)
+            nodes[0] = "";
+
+        for (i = 0; i < nodes.length; i++) {
+            var node = this._nodes[nodes[i]];
+            if (!node) continue;
+
+            var idx = node.indexOf(ns);
+            if (idx < 0) continue;
+                node.splice(idx, 1);
+            if (!node.length)
+                delete this._nodes[nodes[i]];
+        }
+        if (this._initialPresenceSent)
+            account.setPresence(account.currentPresence);
+    },
+
     appendCapsToPresence: function(node)
     {
         var identities = [i.category+"/"+(i.type||"")+"//"+(i.name||"")+">"
