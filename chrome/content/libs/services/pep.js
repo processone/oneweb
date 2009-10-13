@@ -73,6 +73,14 @@ _DECL_(PEPNodeHandler).prototype = {
             }).call(this, delta));
     },
 
+    destroy: function() {
+        if (!this._callback)
+            return;
+
+        servicesManager.unpublishDiscoInfo(this._node+"+notify");
+        delete pepService._observers[this._node];
+    },
+
     publishItem: function(id, data, dontSend) {
         var pkt = new JSJaCIQ();
         var ns = "http://jabber.org/protocol/pubsub"
