@@ -89,6 +89,9 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         var stamp = hasStamp ?
             iso8601TimestampToDate(hasStamp.getAttribute("stamp")) : new Date();
 
+        if (hasStamp && !this.foreignBookmarks[jid])
+            this._pepHandler.getItems(from, new Callback(this._gotItems, this));
+
         for (var i = 0; i < data.added.length; i++) {
             var label = data.added[i].*::title.text();
 
@@ -113,6 +116,10 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         this.modelUpdated("newBookmarks", changes);
 
         return 2;
+    },
+
+    _gotItems: function(from, items) {
+        this._onPEPEvent(from, null, {added: items, removed: []});
     },
 
     // nsINavBookmarkObserver implemenetation
