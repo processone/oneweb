@@ -1,6 +1,7 @@
 var EXPORTED_SYMBOLS = ["bookmarksSharing"];
 
 ML.importMod("exceptions.js");
+ML.importMod("dateutils.js");
 
 function BookmarksSharing() {
     this._bs = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"].
@@ -84,6 +85,10 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
             }
         }
 
+        var hasStamp = pkt && pkt.getChild("delay", "urn:xmpp:delay");
+        var stamp = hasStamp ?
+            iso8601TimestampToDate(hasStamp.getAttribute("stamp")) : new Date();
+
         for (var i = 0; i < data.added.length; i++) {
             var label = data.added[i].*::title.text();
 
@@ -101,7 +106,7 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
             if (!(data.added[i].@id in this.newBookmarks[jid]))
                 changes.added.push([jid, data.added[i].@id, label]);
 
-            this.newBookmarks[jid][data.added[i].@id] = [label, new Date()];
+            this.newBookmarks[jid][data.added[i].@id] = [label, stamp];
         }
 
         this.modelUpdated("foreignBookmarks");
