@@ -113,7 +113,8 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         }
 
         this.modelUpdated("foreignBookmarks");
-        this.modelUpdated("newBookmarks", changes);
+        if (changes.added.length || changes.removed.length)
+            this.modelUpdated("newBookmarks", changes);
 
         return 2;
     },
