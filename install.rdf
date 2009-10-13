@@ -4,6 +4,7 @@
          xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>oneweb@oneweb.im</em:id>
+    <em:type>2</em:type>
     <em:version>1</em:version>
     <em:targetApplication>
       <Description>
@@ -12,19 +13,12 @@
         <em:maxVersion>4.5.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-    <em:updateURL>https://oneteam.im/oneweb-update.rdf</em:updateURL>
     <em:name>OneWeb</em:name>
-    <em:file>
-      <Description about="urn:mozilla:extension:file:oneweb.jar">
-        <em:package>content/</em:package>
-        <em:package>skin/classic/</em:package>
-        <em:package>locale/en-US/</em:package>
-      </Description>
-    </em:file>
     <em:description>OneWeb Extension</em:description>
     <em:creator>process-one.net</em:creator>
     <em:homepageURL>http://oneteam.im/</em:homepageURL>
     <em:iconURL>chrome://oneweb/skin/icons/main.png</em:iconURL>
     <em:optionsURL>chrome://oneweb/content/preferences.xul</em:optionsURL>
+    <em:updateURL>https://oneteam.im/oneweb-update.rdf</em:updateURL>
   </Description>
 </RDF:RDF>
