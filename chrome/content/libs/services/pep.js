@@ -104,6 +104,33 @@ _DECL_(PEPNodeHandler).prototype = {
 
         return pkt;
     },
+
+    getItems: function(to, callback, maxItems) {
+        servicesManager.sendIqWithGenerator(
+            (function (callback) {
+                [pkt, query, queryDOM] = yield {
+                    type: "get",
+                    to: to,
+                    domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub"},
+                                 [["items", maxItems ? {node: this._node, max_items: maxItems} :
+                                                       {node: this._node}]]]
+                };
+
+                var res = [];
+                if (pkt.getType() == "result") {
+                    var ns = new Namespace("http://jabber.org/protocol/pubsub");
+                    dump ("GOT getItems: "+query+"\n");
+
+                    for each (var item in query.ns::items.ns::item)
+                        res.push(item);
+                }
+
+                if (callback)
+                    callback(to, res);
+
+                yield null;
+            }).call(this, callback));
+    },
 }
 
 var pepService = {
