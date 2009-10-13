@@ -21,7 +21,7 @@
       var html = "";
       for (var i = 0; i < bookmarks.length; i++) {
         html += "<div class='block'>"+
-          "<div class='from'>Bookmarks sent by <span class='from-val'>"+
+          "<div class='from'>Bookmarks published by <span class='from-val'>"+
           xmlEscape(bookmarks[i].from)+"</span></div><ul>";
         for (var j = 0; j < bookmarks[i].bookmarks.length; j++) {
           var b = bookmarks[i].bookmarks[j];
