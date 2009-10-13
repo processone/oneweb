@@ -105,6 +105,8 @@ _DECL_(ServicesManager).prototype =
             else
                 this._nodes[nodes[i]] = [ns];
         }
+        if (this._initialPresenceSent)
+            account.setPresence(account.currentPresence);
     },
 
     appendCapsToPresence: function(node)
