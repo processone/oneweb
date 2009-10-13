@@ -81,6 +81,37 @@ _DECL_(PEPNodeHandler).prototype = {
         delete pepService._observers[this._node];
     },
 
+    createNode: function(callback, configuration) {
+        servicesManager.sendIqWithGenerator(
+            (function (configuration) {
+                var fields = [];
+
+                configuration["FORM_TYPE"] = "http://jabber.org/protocol/pubsub#node_config";
+                for (var v in configuration)
+                    fields.push(["field", {"var": v}, [["value", {}, [configuration[v]]]]]);
+
+                var form = fields.length == 1 ? [] :
+                    ["x", {xmlns: "jabber:x:data", type: "submit"}, fields];
+
+                [pkt, query, queryDOM] = yield {
+                    type: "set",
+                    domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
+                                 [["create", {node: this._node}, []]
+                                  ["configure", {},
+                                   [form]]]]
+                };
+
+                if (callback) {
+                    var error = pkt.getChild(null, "urn:ietf:params:xml:ns:xmpp-stanzas");
+                    var type = pkt.getType() == "result" ? null : error ? error.nodeName : "unknown";
+                    callback(type);
+                }
+
+                yield null;
+            }).call(this, delta));
+        return null;
+    },
+
     publishItem: function(id, data, dontSend) {
         var pkt = new JSJaCIQ();
         var ns = "http://jabber.org/protocol/pubsub"
