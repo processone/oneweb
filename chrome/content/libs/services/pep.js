@@ -73,7 +73,7 @@ _DECL_(PEPNodeHandler).prototype = {
             }).call(this, delta));
     },
 
-    publishItem: function(id, data) {
+    publishItem: function(id, data, dontSend) {
         var pkt = new JSJaCIQ();
         var ns = "http://jabber.org/protocol/pubsub"
 
@@ -83,10 +83,13 @@ _DECL_(PEPNodeHandler).prototype = {
                        [["publish", {node: this._node},
                          [["item", id ? {id: id} : {}, data]]]]);
 
-        account.connection.send(pkt);
+        if (!dontSend)
+            account.connection.send(pkt);
+
+        return pkt;
     },
 
-    retractItem: function(id) {
+    retractItem: function(id, dontSend) {
         var pkt = new JSJaCIQ();
         var ns = "http://jabber.org/protocol/pubsub"
 
@@ -96,8 +99,11 @@ _DECL_(PEPNodeHandler).prototype = {
                        [["retract", {node: this._node},
                          [["item", {id: id}, []]]]]);
 
-        account.connection.send(pkt);
-    }
+        if (!dontSend)
+            account.connection.send(pkt);
+
+        return pkt;
+    },
 }
 
 var pepService = {
