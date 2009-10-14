@@ -147,7 +147,7 @@ sub new {
     my $class = shift;
     my $self = {
         strings => {},
-        string_refs => {},
+        string_refs => {PluralForms => 1},
     };
     bless $self, $class;
 }
@@ -181,7 +181,7 @@ sub get_string_ref {
 
     my $esc = $escape_xml ? sub {::escape_xml(shift)} : sub { shift };
 
-    return $esc->('_("plural.forms")') if $str =~ /^\$\$plural_forms\$\$:/;
+    return $esc->('_("pPluralForms")') if $str =~ /^\$\$plural_forms\$\$:/;
 
     my $hash = $inp_str->hash();
 
@@ -241,7 +241,7 @@ sub get_locale_files_content {
         }
     }
 
-    my $plurals = "plural.forms = \"".($po_file ? $po_file->plural_forms : "n==1?0:1")."\"\n";
+    my $plurals = "pPluralForms = ".($po_file ? $po_file->plural_forms : "n==1?0:1")."\n";
     return (join("\n", $plurals, sort(@props)), join("\n", sort(@dtd)));
 }
 
