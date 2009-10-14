@@ -14,7 +14,6 @@ _DECL_(PEPNodeHandler).prototype = {
      * @param delta Object - Hash with attribute name as property, and new
      *   value as hash value
      */
-
     getConfiguration: function(callback, force) {
         if (this._configuration && !force) {
             if (callback)
@@ -169,7 +168,7 @@ _DECL_(PEPNodeHandler).prototype = {
 
                 yield null;
             }).call(this, callback));
-    },
+    }
 }
 
 var pepService = {
