@@ -64,6 +64,7 @@ function Account()
             this.modelUpdated("connectionInfo");
         }
     }
+    this.loginStateMsgToken = this.setGlobalMessage("loggetout", _("Logged Out"), 10);
 }
 
 _DECL_(Account, null, Model, DiscoItem).prototype =
@@ -434,6 +435,9 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         this.resetGlobalMessage(this.loginMsgToken);
 
         this.modelUpdated("connected");
+
+        this.resetGlobalMessage(this.loginStateMsgToken);
+        this.loginStateMsgToken = this.setGlobalMessage("loggedin", _("OneWeb"), 10);
     },
 
     _initConnectionStep: function(flags) {
@@ -485,6 +489,9 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         this.modelUpdated("account.connection");
         this.modelUpdated("connected");
         this.modelUpdated("connectionInitialized");
+
+        this.resetGlobalMessage(this.loginStateMsgToken);
+        this.loginStateMsgToken = this.setGlobalMessage("loggetout", _("Logged Out"), 10);
 
         var groups = this.groups;
 
