@@ -107,8 +107,6 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         }
 
         var hasStamp = pkt && pkt.getChild("delay", "urn:xmpp:delay");
-        var stamp = hasStamp ?
-            iso8601TimestampToDate(hasStamp.getAttribute("stamp")) : new Date();
 
         if (hasStamp && !this.foreignBookmarks[jid])
             this._pepHandler.getItems(from, new Callback(this._gotItems, this));
@@ -119,18 +117,31 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
             if (!this.foreignBookmarks[jid])
                 this.foreignBookmarks[jid] = {};
 
-            this.foreignBookmarks[jid][data.added[i].@id] = [label, new Date()];
+            var date = account.cache.getValue("bookmarks-"+jid+"-"+data.added[i].@id);
+            var exists = date != null;
+
+            date = parseInt(date);
+
+            if (isNaN(date) || date == 1) {
+                date = hasStamp ? iso8601TimestampToDate(hasStamp.getAttribute("stamp")) :
+                    new Date();
+
+                account.cache.setValue("bookmarks-"+jid+"-"+data.added[i].@id, date);
+            } else
+                date = new Date(date);
+
+            this.foreignBookmarks[jid][data.added[i].@id] = [label, date];
 
             if (!this.newBookmarks[jid])
                 this.newBookmarks[jid] = {};
 
-            if (account.cache.getValue("bookmarks-"+jid+"-"+data.added[i].@id))
+            if (exists)
                 continue;
 
             if (!(data.added[i].@id in this.newBookmarks[jid]))
                 changes.added.push([jid, data.added[i].@id, label]);
 
-            this.newBookmarks[jid][data.added[i].@id] = [label, stamp];
+            this.newBookmarks[jid][data.added[i].@id] = [label, date];
         }
 
         this.modelUpdated("foreignBookmarks");
