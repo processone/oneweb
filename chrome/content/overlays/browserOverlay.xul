@@ -7,7 +7,18 @@
 
   <script><![CDATA[
     var OneWeb = {
-      onStatusClick: function() {
+      init: function(service) {
+        this.service = service;
+      },
+
+      updateContextMenu: function(popup, ev) {
+        popup.childNodes[0].hidden = this.service.connected;
+        popup.childNodes[1].hidden = !this.service.connected;
+      },
+
+      onStatusClick: function(event) {
+        if (event.button != 0)
+          return;
         openDialog("chrome://oneweb/content/bookmarks.xul", "_blank",
                    "resizable=yes,chrome=yes,dialog=no", this.bookmarks || [],
                    this.newBookmarks || []);
@@ -25,6 +36,18 @@
 
         si.setAttribute("label", data ? data.message : "OneWeb");
         si.setAttribute("messageType", data ? data.type : "");
+      },
+
+      login: function() {
+        this.service.login();
+      },
+
+      logout: function() {
+        this.service.logout();
+      },
+
+      prefs: function() {
+        this.service.showPrefs();
       }
     }
   ]]></script>
@@ -36,9 +59,19 @@
 
     <tooltip id="oneweb-messages-tooltip"/>
 
+    <menupopup id="oneweb-context" onpopupshowing="OneWeb.updateContextMenu(this, event)">
+      <menuitem id="oneweb-login" label="Login" oncommand="OneWeb.login()"/>
+      <menuitem id="oneweb-logout" label="Logout" oncommand="OneWeb.logout()"/>
+      <menuseparator/>
+      <menuitem id="oneweb-preferences" label="Preferences..." oncommand="OneWeb.prefs()"/>
+    </menupopup>
+
     <statusbarpanel id="oneweb-status" class="statusbarpanel-iconic-text"
                     onclick="OneWeb.onStatusClick(event)"
-                    tooltip="oneweb-default-tooltip"/>
+                    tooltip="oneweb-default-tooltip"
+                    context="oneweb-context">
+    </statusbarpanel>
   </statusbar>
+
 
 </overlay>

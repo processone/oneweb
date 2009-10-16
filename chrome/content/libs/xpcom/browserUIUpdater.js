@@ -41,6 +41,22 @@ var uiUpdater = {
         win.addEventListener("load", this, false);
     },
 
+    _service: {
+        connected: false,
+
+        login: function() {
+            uiUpdater._tryConnect(true);
+        },
+
+        logout: function() {
+            account.disconnect();
+        },
+
+        showPrefs: function() {
+            account.showPrefs();
+        }
+    },
+
     handleEvent: function(event) {
         if (event.type != "load")
             return;
@@ -51,6 +67,8 @@ var uiUpdater = {
             return;
 
         var ow = event.target.defaultView.OneWeb;
+
+        ow.init(this._service);
 
         if (this._bookmarks)
             ow.onBookmarksChanged.apply(ow, this._bookmarks);
@@ -89,6 +107,10 @@ var uiUpdater = {
         });
 
         return [res, count];
+    },
+
+    onConnectedChanged: function() {
+        this._service.connected = account.connected;
     },
 
     onNewBookmarkChanged: function(model, prop, changes) {
@@ -144,7 +166,10 @@ var uiUpdater = {
         ML.importMod("model/account.js");
 
         account.registerView(this.onGlobalMessageChanged, this, "globalMessage");
+        account.registerView(this.onConnectedChanged, this, "connected");
+
         bookmarksSharing.registerView(this.onNewBookmarkChanged, this, "newBookmarks");
+        bookmarksSharing.registerView(this.onNewBookmarkChanged, this, "foreignBookmarks");
 
 
         if (!this._tryConnect(true))
