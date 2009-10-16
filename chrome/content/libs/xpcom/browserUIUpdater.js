@@ -49,6 +49,7 @@ var uiUpdater = {
         },
 
         logout: function() {
+            uiUpdater.selfDisconnect = true;
             account.disconnect();
         },
 
@@ -111,6 +112,12 @@ var uiUpdater = {
 
     onConnectedChanged: function() {
         this._service.connected = account.connected;
+
+        if (!account.connected) {
+            if (!this.selfDisconnect)
+                setTimeout(this._tryConnect, 5000);
+        } else
+            this.selfDisconnect = false;
     },
 
     onNewBookmarkChanged: function(model, prop, changes) {
