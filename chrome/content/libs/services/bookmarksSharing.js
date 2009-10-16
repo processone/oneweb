@@ -8,6 +8,8 @@ function BookmarksSharing() {
         getService(Components.interfaces.nsINavBookmarksService);
     this._ts = Components.classes["@mozilla.org/browser/tagging-service;1"].
         getService(Components.interfaces.nsITaggingService);
+    this._ios = Components.classes["@mozilla.org/network/io-service;1"].
+        getService(Components.interfaces.nsIIOService);
 
     this.init();
 
@@ -48,13 +50,32 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
     _bookmarksIds: {},
     _modified: {},
 
+    pageIsShared: function(url) {
+        this._trace(arguments);
+        var uri = this._ios.newURI(url, null, null);
+        var tags = this._ts.getTagsForURI(uri, {});
+
+        return tags.indexOf("public") >= 0;
+    },
+
+    sharePage: function(url, title) {
+        var uri = this._ios.newURI(url, null, null);
+
+        if (!this._bs.isBookmarked(uri))
+            this._bs.insertBookmark(this._bs.unfiledBookmarksFolder, uri, -1, title);
+
+        this._ts.tagURI(uri, ["public"]);
+
+        return;
+    },
+
     resetNewBookmarks: function() {
         var changes = {added: [], removed: []};
 
         for (var jid in this.newBookmarks)
             for (var url in this.newBookmarks[jid]) {
                 changes.removed.push([jid, url]);
-                account.cache.setValue("bookmarks-"+jid+"-"+url, 1)
+                account.cache.setValue("bookmarks-"+jid+"-"+url, this.newBookmarks[jid][1]);
             }
 
         this.newBookmarks = {};
