@@ -155,6 +155,8 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         if (!internal)
             this._trace(arguments);
 
+        var state;
+
         for (i in this._modified) {
             if (i in this._prev && this._prev[i] == this._bookmarks[i])
                 continue;
@@ -163,6 +165,8 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
                 this._pepHandler.reconfigureNode({"pubsub#persist_items": 1,
                                                   "pubsub#notify_retract": 1});
             this._configuredNode = true;
+
+            state = this._bookmarks[i] ? 1 : state == 1 ? 1 : 2;
 
             if (this._bookmarks[i])
                 this._pepHandler.publishItem(i, [["title",
@@ -173,6 +177,14 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         this._modified = {};
         this._prev = {};
 
+        if (state == 1)
+            account.setGlobalMessage("bookmarkShared",
+                                     _("Shared bookmark set"),
+                                     300, 1500);
+        else if (state == 2)
+            account.setGlobalMessage("bookmarkUnshared",
+                                     _("Shared bookmark removed"),
+                                     300, 1500);
         }catch(ex){dump(ex+"\n")}
         this._inBatch = false;
     },
