@@ -166,6 +166,15 @@ var adhocCmds = {
     }]
 };
 
+function commandAllowed(jid, node) {
+    var permission = account.permissions[node.toLowerCase()] || 0;
+    var shortJID = jid.normalizedJID.shortJID;
+
+
+    return permission == 2 || shortJID == account.myJID.normalizedJID.shortJID ||
+            permission == 1 && account.contacts[shortJID];
+}
+
 servicesManager.addIQService("http://jabber.org/protocol/commands", function (pkt, query, queryDOM) {
     var jid = new JID(pkt.getFrom());
     var result;
@@ -175,12 +184,7 @@ servicesManager.addIQService("http://jabber.org/protocol/commands", function (pk
 
     var node = query.@node.toString();
 
-    var permission = account.permissions[node.toLowerCase()] || 0;
-
-    var shortJID = jid.normalizedJID.shortJID;
-
-    if (!(permission == 2 || shortJID == account.myJID.normalizedJID.shortJID||
-          permission == 1 && account.contacts[shortJID]))
+    if (!commandAllowed(jid, node))
         return {
             type: "error",
             dom: queryDOM,
@@ -236,7 +240,7 @@ servicesManager.addIQService("http://jabber.org/protocol/commands", function (pk
 
 for (var i in adhocCmds) {
     servicesManager.publishDiscoItems("http://jabber.org/protocol/commands",
-                                      i, adhocCmds[i][0]);
+                                      i, adhocCmds[i][0], commandAllowed);
     servicesManager.publishDiscoInfo("http://jabber.org/protocol/commands",
                                      i, {name: adhocCmds[i][0],
                                          category: "automation",

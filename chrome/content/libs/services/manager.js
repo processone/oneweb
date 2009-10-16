@@ -69,12 +69,14 @@ _DECL_(ServicesManager).prototype =
         this._messageHandlers[ns] = handler;
     },
 
-    publishDiscoItems: function(node, itemNode, itemName)
+    publishDiscoItems: function(node, itemNode, itemName, checkPerms)
     {
+        var v = {node: itemNode, name: itemName, checkPerms: checkPerms};
+
         if (!this._items[node])
-            this._items[node] = [{node: itemNode, name: itemName}];
+            this._items[node] = [v];
         else
-            this._items[node].push({node: itemNode, name: itemName});
+            this._items[node].push(v);
     },
 
     publishDiscoIdentity: function(nodes, identity)
@@ -202,12 +204,17 @@ _DECL_(ServicesManager).prototype =
                 default xml namespace = "http://jabber.org/protocol/disco#items";
 
                 response = <query/>;
-                if (query.getAttribute("node"))
-                    response.@node = query.getAttribute("node");
-                var items = this._items[query.getAttribute("node")||""] || [];
+                var node = query.getAttribute("node")||"";
+
+                if (node)
+                    response.@node = node;
+
+                var items = this._items[node] || [];
+                var from = new JID(pkt.getFrom());
 
                 for (var i = 0; i < items.length; i++)
-                    response.* += <item jid={account.myJID} node={items[i].node} name={items[i].name}/>
+                    if (!items[i].checkPerms || items[i].checkPerms(from, items[i].node, node))
+                        response.* += <item jid={account.myJID} node={items[i].node} name={items[i].name}/>
             }
             break;
 
