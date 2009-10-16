@@ -323,10 +323,13 @@ _DECL_(Contact, null, Model, Comparator, DiscoItem).prototype =
         if (!this.activeResource || this.activeResource.isLt(resource)) {
             this.activeResource = resource;
             this.modelUpdated("resources", {added: [resource]});
+            account.modelUpdated("resources", {added: [resource]});
             this.modelUpdated("activeResource");
             this.modelUpdated("presence");
-        } else
+        } else {
             this.modelUpdated("resources", {added: [resource]});
+            account.modelUpdated("resources", {added: [resource]});
+        }
         if (notifyGroups && !this._notVisibleInRoster)
             for (var g in this.groupsIterator())
                 g._onContactUpdated(this);
@@ -347,10 +350,13 @@ _DECL_(Contact, null, Model, Comparator, DiscoItem).prototype =
         }
         if (this.activeResource == resource && this._onResourceUpdated(resource, true)) {
             this.modelUpdated("resources", {removed: [resource]})
+            account.modelUpdated("resources", {removed: [resource]})
             this.modelUpdated("activeResource");
             this.modelUpdated("presence");
-        } else
+        } else {
             this.modelUpdated("resources", {removed: [resource]});
+            account.modelUpdated("resources", {removed: [resource]})
+        }
     },
 
     cmp: function(c, usePresence)
