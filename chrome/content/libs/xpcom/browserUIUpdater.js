@@ -44,6 +44,9 @@ var uiUpdater = {
     _service: {
         connected: false,
 
+        commands: {
+        },
+
         login: function() {
             uiUpdater._tryConnect(true);
         },
@@ -55,6 +58,14 @@ var uiUpdater = {
 
         showPrefs: function() {
             account.showPrefs();
+        },
+
+        pageIsShared: function(url) {
+            return bookmarksSharing.pageIsShared(url);
+        },
+
+        sharePage: function(url, title) {
+            bookmarksSharing.sharePage(url, title);
         }
     },
 

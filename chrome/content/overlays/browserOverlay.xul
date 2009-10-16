@@ -9,11 +9,42 @@
     var OneWeb = {
       init: function(service) {
         this.service = service;
+        document.getElementById("contentAreaContextMenu").
+          addEventListener("popupshowing", this, false);
       },
 
       updateContextMenu: function(popup, ev) {
         popup.childNodes[0].hidden = this.service.connected;
         popup.childNodes[1].hidden = !this.service.connected;
+
+        while (popup.childNodes.length > 5)
+          popup.removeChildren(popup.childNodes[3]);
+
+        for (var jid in this.service.commands) {
+          var item = this.service.commands[jid];
+
+          var m = document.createElement("menu");
+
+          m.setAttribute("label", item.name+" commands");
+
+          var p = document.createElement("menupopup");
+          m.appendChild(p);
+
+          for (var cmd in item.commands) {
+            var c = document.createElement("menuitem");
+
+            c.setAttribute("label", item.commands[cmd]);
+            c.setAttribute("oncommand", "OneWeb.execCmd(this.jid, this.command)");
+
+            c.command = cmd;
+            c.jid = jid;
+
+            p.appendChild(c);
+          }
+          popup.insertBefore(m, popup.childNodes[3]);
+        }
+
+        popup.childNodes[2].hidden = popup.childNodes.length <= 5;
       },
 
       onStatusClick: function(event) {
@@ -38,6 +69,11 @@
         si.setAttribute("messageType", data ? data.type : "");
       },
 
+      handleEvent: function() {
+        document.getElementById("oneweb-share-page").hidden =
+          this.service.pageIsShared(gContextMenu.target.ownerDocument.location.href);
+      },
+
       login: function() {
         this.service.login();
       },
@@ -48,11 +84,25 @@
 
       prefs: function() {
         this.service.showPrefs();
+      },
+
+      sharePage: function() {
+        var doc = gContextMenu.target.ownerDocument;
+
+        this.service.sharePage(doc.location.href, doc.title);
       }
     }
   ]]></script>
 
   <statusbar id="status-bar">
+    <statusbarpanel id="oneweb-status" class="statusbarpanel-iconic-text"
+                    onclick="OneWeb.onStatusClick(event)"
+                    tooltip="oneweb-default-tooltip"
+                    context="oneweb-context">
+    </statusbarpanel>
+  </statusbar>
+
+  <popupset id="mainPopupSet">
     <tooltip id="oneweb-default-tooltip">
       <label value="OneWeb"/>
     </tooltip>
@@ -63,15 +113,12 @@
       <menuitem id="oneweb-login" label="Login" oncommand="OneWeb.login()"/>
       <menuitem id="oneweb-logout" label="Logout" oncommand="OneWeb.logout()"/>
       <menuseparator/>
+      <menuseparator/>
       <menuitem id="oneweb-preferences" label="Preferences..." oncommand="OneWeb.prefs()"/>
     </menupopup>
-
-    <statusbarpanel id="oneweb-status" class="statusbarpanel-iconic-text"
-                    onclick="OneWeb.onStatusClick(event)"
-                    tooltip="oneweb-default-tooltip"
-                    context="oneweb-context">
-    </statusbarpanel>
-  </statusbar>
-
+    <popup id="contentAreaContextMenu">
+      <menuitem id="oneweb-share-page" label="Share this page" oncommand="OneWeb.sharePage()"/>
+    </popup>
+  </popupset>
 
 </overlay>
