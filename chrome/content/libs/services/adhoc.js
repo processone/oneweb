@@ -49,6 +49,7 @@ var adhocCmds = {
                                          "<body xmlns='http://www.w3.org/1999/xhtml'>"+
                                              msgHtml+"</body></html>", "text/xml");
             msgPkt.appendNode(doc.documentElement);
+            msgPkt.appendNode("opened-tabs", {xmlns: "http://oneweb.im/command"}, []);
 
             account.connection.send(msgPkt);
 
@@ -152,6 +153,7 @@ var adhocCmds = {
                                              "<body xmlns='http://www.w3.org/1999/xhtml'>"+
                                                  msgHtml+"</body></html>", "text/xml");
                 msgPkt.appendNode(doc.documentElement);
+                msgPkt.appendNode("bookmarks-search", {xmlns: "http://oneweb.im/command"}, []);
 
                 account.connection.send(msgPkt);
 
