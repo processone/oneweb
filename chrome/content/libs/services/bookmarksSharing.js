@@ -230,6 +230,7 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
 
         if (property != "tags" || isAnnotationProperty)
             return;
+
         if (itemType == null)
             itemType = this._bs.getItemType(itemId);
 
@@ -240,7 +241,8 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         var tags = this._ts.getTagsForURI(uri, {}), title;
 
         if (tags.indexOf("public") >= 0) {
-            this._updateBookmark(uri, this._bs.getItemTitle(itemId));
+            var title = this._bs.getItemTitle(itemId);
+            this._bookmarksIds[itemId] = [this._updateBookmark(uri, title), title];
         } else if (uri.spec in this._bookmarks) {
             this._modified[uri.spec] = 1;
             delete this._bookmarks[uri.spec];
