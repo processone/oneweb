@@ -254,7 +254,7 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
 
     _uniqEventId: 0,
 
-    setGlobalMessage: function(type, message, priority)
+    setGlobalMessage: function(type, message, priority, timeout)
     {
         var token = {type: type, message: message, priority: priority};
 
@@ -263,6 +263,11 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
                 break;
 
         this.globalMessages.splice(i, 0, token);
+
+        if (timeout)
+            setTimeout(function(token) {
+                account.resetGlobalMessage(token)
+            }, timeout, token);
 
         if (i > 0)
             return token;
