@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://oneteam/skin/dialog.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneteam/skin/main/main.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneteam/skin/dataforms/dataforms.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneteam/content/bindings/bindings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneteam-branding/locale/branding.css" type="text/css"?>
+
+<?xul-overlay href="chrome://oneteam/content/overlays/macMenuOverlay.xul"?>
+
+<wizard id="adhoc" windowtype="ot:adhoc" title="_('Ad-Hoc Commands')"
+    onwizardfinish="return true" onwizardcancel="return onWizardCancel()"
+    onwizardnext="return onWizardNext()" onwizardback="return onWizardBack()"
+    persist="width height" width="600" height="500"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="text/javascript;version=1.7" src="libs/moduleloader.js"/>
+  <script type="text/javascript;version=1.7"><![CDATA[
+    ML.importMod("model/account.js");
+    ML.importMod("dataforms.js");
+
+    var jid, command, pkt = window.arguments[0];
+
+    var initialized = true;
+    var sessionid, id, form, canGoBack, canGoForward;
+
+    function onWizardCancel()
+    {
+      if (sessionid)
+        sendFormResults("cancel", sessionid, null);
+
+      return true;
+    }
+
+    function onWizardNext() {try{
+      var wizard = document.documentElement;
+      wizard.canAdvance = true;
+
+      if (pkt) {
+        jid = pkt.getFrom();
+        command = pkt.getNode().getElementsByTagName("command")[0].getAttribute("node");
+
+        document.getElementById("main-deck").selectedIndex = 1;
+      }
+
+      var currentPage = wizard.wizardPages[wizard.pageIndex+1];
+      var deck = currentPage.firstChild;
+
+      if (!sessionid)
+        canGoForward = true;
+
+      deck.selectedIndex = 0;
+
+      var p = deck.childNodes[1];
+      while (p.firstChild)
+        p.removeChild(p.firstChild);
+
+      if (canGoForward) {
+        if (wizard.pageIndex+2 == wizard.pageCount) {
+          var newPage = currentPage.cloneNode(true);
+          newPage.setAttribute("pageid", "page"+wizard.pageCount);
+          newPage.pageIndex = wizard.pageCount;
+          currentPage.parentNode.appendChild(newPage);
+          wizard.pageCount++;
+        }
+      } else {
+        while (currentPage.nextSibling) {
+          currentPage.parentNode.removeChild(currentPage.nextSibling);
+          wizard.pageCount--;
+        }
+      }
+
+      if (pkt) {
+        setTimeout(onForm, 0, pkt);
+        pkt = null;
+
+        return true;
+      }
+
+      if (sessionid)
+        sendFormResults(canGoForward ? null : "execute", sessionid, form)
+      else
+        sendFormResults("execute", null, null);
+    }catch(ex){alert(ex)}
+      return true;
+    }
+
+    function onWizardBack()
+    {
+      var wizard = document.documentElement;
+
+      if (!canGoBack) {
+        var page = wizard.pageIndex;
+
+        onWizardCancel();
+        wizard.goTo("first");
+
+        for (; page > 0; page--) {
+          var deck = wizard.wizardPages[page].firstChild;
+          deck.selectedIndex = 0;
+          wizard.unregisterVerifiables(deck);
+
+          var p = deck.childNodes[1];
+          while (p.firstChild)
+            p.removeChild(p.firstChild);
+        }
+        return false;
+      }
+      var deck = wizard.wizardPages[wizard.pageIndex].firstChild;
+      wizard.unregisterVerifiables(deck);
+      deck.selectedIndex = 0;
+
+      var p = deck.childNodes[1];
+      while (p.firstChild)
+        p.removeChild(p.firstChild);
+
+      sendFormResults("prev", sessionid, null)
+    }
+
+    function sendFormResults(action, sessionid, form)
+    {
+      var response = <command xmlns="http://jabber.org/protocol/commands" node={command}/>
+
+      if (action)
+        response.@action = action;
+      if (sessionid)
+        response.@sessionid = sessionid;
+      if (form)
+        response.* += buildResponseDataFormFromXUL(form);
+
+      var iq = new JSJaCIQ();
+      iq.setIQ(jid, "set", id);
+      iq.getNode().appendChild(E4XtoDOM(response, iq.getDoc()))
+      account.connection.send(iq, onForm);
+    }
+
+    function onDiscoItems(di, items) {
+      var cmds = document.getElementById("commands");
+
+      for (var i = 0; i < items.length; i++) {
+        var el = document.createElement("radio");
+        el.setAttribute("label", items[i].discoName);
+        el.setAttribute("value", items[i].discoNode);
+        cmds.appendChild(el);
+      }
+      if (items.length == 0) {
+        var wizard = document.documentElement;
+        document.getElementById("noCommands").hidden = false;
+        wizard.pageCount = 1;
+        wizard.pageIndex = 0;
+      }
+      cmds.selectedIndex = 0;
+      document.documentElement.canAdvance = true;
+      document.getElementById("main-deck").selectedIndex = 1;
+    }
+
+    function onForm(pkt)
+    {
+      if (!document)
+        return;
+
+      var wizard = document.documentElement;
+      var cp = wizard.currentPage;
+      var c = cp.firstChild.childNodes[1];
+
+      if (pkt.getType() != "result") {
+        cp.firstChild.childNodes[1].appendChild(document.createElement("label")).
+          setAttribute("label", "Error!");
+        sessionid = null;
+        cp.firstChild.selectedIndex = 1;
+        return;
+      }
+
+      var cmd = DOMtoE4X(pkt.getNode().getElementsByTagName("command")[0]);
+      if (cmd.@status == "executing") {
+        sessionid = cmd.@sessionid.toString();
+        id = pkt.getID();
+      } else
+        sessionid = id = null;
+
+      const xns = new Namespace("jabber:x:data");
+      const cns = new Namespace("http://jabber.org/protocol/commands");
+
+      for each (var note in cmd.cns::note)
+        c.appendChild(document.createElement("description")).textContent = note.text();
+
+      c.appendChild(form = generateXULFromDataForm(cmd..xns::x, document));
+
+      wizard.canAdvance = true;
+      wizard.canRewind = !(cmd.@status == "completed");
+
+      canGoBack = cmd.cns::actions.cns::prev.length();
+      canGoForward = cmd.cns::actions.cns::execute.length() ||
+        cmd.cns::actions.cns::next.length() ||
+        cmd.@status != "completed";
+
+      if (!canGoForward) {
+        var currentPage = wizard.wizardPages[wizard.pageIndex];
+        while (currentPage.nextSibling)
+          currentPage.parentNode.removeChild(currentPage.nextSibling);
+
+        wizard.pageCount = wizard.wizardPages.length;
+        currentPage.pageIndex = currentPage.pageIndex;
+        wizard.pageIndex = wizard.pageIndex;
+      }
+
+      cp.firstChild.selectedIndex = 1;
+    }
+  ]]></script>
+
+  <group id="macMenu"/>
+
+  <toolbox id="mainToolbox">
+    <menubar id="macMenuBar"/>
+  </toolbox>
+
+  <wizardpage onpageshow="sessionid=null" pageid="first">
+    <deck id="main-deck">
+      <vbox>
+        <label value="_('Requesting remote commands descriptions')"/>
+        <spacer/>
+        <progressmeter mode="undetermined"/>
+      </vbox>
+      <vbox>
+        <radiogroup id="commands">
+          <caption label="_('List of available commands:')"/>
+        </radiogroup>
+        <label id="noCommands" style="font-weight: bold; margin: 1em 2em"
+               value="_('No commands available')" hidden="true"/>
+      </vbox>
+    </deck>
+  </wizardpage>
+
+  <wizardpage pageid="page1">
+    <deck>
+      <vbox>
+        <label value="_('Requesting command form')"/>
+        <spacer/>
+        <progressmeter mode="undetermined"/>
+      </vbox>
+      <vbox/>
+    </deck>
+  </wizardpage>
+</wizard>

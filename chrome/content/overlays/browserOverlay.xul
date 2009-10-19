@@ -14,11 +14,14 @@
       },
 
       updateContextMenu: function(popup, ev) {
+        if (ev.originalTarget != popup)
+          return;
+
         popup.childNodes[0].hidden = this.service.connected;
         popup.childNodes[1].hidden = !this.service.connected;
 
         while (popup.childNodes.length > 5)
-          popup.removeChildren(popup.childNodes[3]);
+          popup.removeChild(popup.childNodes[3]);
 
         for (var jid in this.service.commands) {
           var item = this.service.commands[jid];
@@ -34,7 +37,7 @@
             var c = document.createElement("menuitem");
 
             c.setAttribute("label", item.commands[cmd]);
-            c.setAttribute("oncommand", "OneWeb.execCmd(this.jid, this.command)");
+            c.setAttribute("oncommand", "OneWeb.executeCommand(this.jid, this.command)");
 
             c.command = cmd;
             c.jid = jid;

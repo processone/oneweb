@@ -172,7 +172,6 @@ function commandAllowed(jid, node) {
     var permission = account.permissions[node.toLowerCase()] || 0;
     var shortJID = jid.normalizedJID.shortJID;
 
-
     return permission == 2 || shortJID == account.myJID.normalizedJID.shortJID ||
             permission == 1 && account.contacts[shortJID];
 }
@@ -249,3 +248,35 @@ for (var i in adhocCmds) {
                                          type: "command-node"});
     servicesManager.publishDiscoInfo("jabber:x:data", i);
 }
+
+
+servicesManager.addMessageService("http://oneweb.im/command", function(pkt, node, jid, nodeE4X) {
+    var body = pkt.getNode().getElementsByTagNameNS("http://www.w3.org/1999/xhtml", "body")[0];
+    if (!body)
+        return 2;
+
+    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].
+        getService(Components.interfaces.nsIWindowMediator);
+    var browser = wm.getMostRecentWindow("navigator:browser");
+    browser = browser && browser.getBrowser();
+
+    if (!browser)
+        return 2;
+
+    var tab = browser.addTab("chrome://oneweb/content/result.xul", null, null);
+    browser.selectedTab = tab;
+
+    tab.linkedBrowser.addEventListener("load", {
+        handleEvent: function(ev) {
+            this.browser.removeEventListener("load", this, true);
+
+            this.win.data = this.val;
+        },
+
+        win: tab.linkedBrowser.contentWindow.wrappedJSObject,
+        browser: tab.linkedBrowser,
+        val: body.innerHTML
+    }, true);
+
+    return 2;
+});

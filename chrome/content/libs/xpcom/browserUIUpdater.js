@@ -60,6 +60,16 @@ var uiUpdater = {
             account.showPrefs();
         },
 
+        executeCommand: function(jid, command) {
+            var response = <command xmlns="http://jabber.org/protocol/commands" node={command}/>
+
+            var iq = new JSJaCIQ();
+            iq.setIQ(jid, "set");
+            iq.appendNode(response);
+
+            account.connection.send(iq, new Callback(uiUpdater.onForm, uiUpdater));
+        },
+
         pageIsShared: function(url) {
             return bookmarksSharing.pageIsShared(url);
         },
@@ -135,6 +145,57 @@ var uiUpdater = {
             this.selfDisconnect = false;
     },
 
+    onResourcesChanged: function(model, type, data) {
+        dump("onResourcesChanged: "+(data.added||[]).length+", "+(data.removed||[]).length+"\n");
+        if (data.added && data.added.length)
+            for (var i = 0; i < data.added.length; i++) {
+                if (!data.added[i].jid.resource || data.added[i].jid.resource.indexOf("OneWeb-") != 0)
+                    continue;
+
+                var di = new DiscoItem(data.added[i].jid, null, "http://jabber.org/protocol/commands");
+                di.getDiscoItems(false, new Callback(this.onDiscoItems, this));
+            }
+        if (data.removed && data.removed.length)
+            for (var i = 0; i < data.removed.length; i++)
+                delete this._service.commands[data.removed[i].jid];
+    },
+
+    onForm: function(pkt) {
+        if (pkt.getType() == "error") {
+            account.setGlobalMessage("commandError",
+                                     _("Command returned an error"),
+                                     300, 1500);
+            return;
+        }
+
+        var cmd = DOMtoE4X(pkt.getNode().getElementsByTagName("command")[0]);
+        if (cmd.@status == "completed") {
+            account.setGlobalMessage("commandCompleted",
+                                     _("Command executed successfully"),
+                                     300, 1500);
+            return;
+        }
+
+        openDialogUniq("ow:adhoc", "chrome://oneweb/content/adhoc.xul",
+                       "chrome,centerscreen", pkt);
+    },
+
+    onDiscoItems: function(di, items) {
+        this._trace(arguments)
+        try{
+        if (items.length == 0)
+            return;
+        var c = this._service.commands[di.discoJID] = {
+            name: account.getContactOrResourceName(di.discoJID),
+            commands: {
+            }
+        }
+
+        for (var i = 0; i < items.length; i++)
+            c.commands[items[i].discoNode] = items[i].discoName;
+        }catch(ex){dump(ex+"\n")}
+    },
+
     onNewBookmarkChanged: function(model, prop, changes) {
         var [newBookmarks, newCount] = this._convertBookmarks(bookmarksSharing.newBookmarks);
         var [bookmarks, count] = this._convertBookmarks(bookmarksSharing.foreignBookmarks);
@@ -189,10 +250,12 @@ var uiUpdater = {
 
         account.registerView(this.onGlobalMessageChanged, this, "globalMessage");
         account.registerView(this.onConnectedChanged, this, "connected");
+        account.registerView(this.onResourcesChanged, this, "resources");
 
         bookmarksSharing.registerView(this.onNewBookmarkChanged, this, "newBookmarks");
         bookmarksSharing.registerView(this.onNewBookmarkChanged, this, "foreignBookmarks");
 
+        bookmarksSynchronising._init();
 
         if (!this._tryConnect(true))
             account.registerView(new Callback(this._tryConnect, this).addArgs(false), null,
