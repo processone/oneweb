@@ -50,9 +50,19 @@
       onStatusClick: function(event) {
         if (event.button != 0)
           return;
-        openDialog("chrome://oneweb/content/bookmarks.xul", "_blank",
-                   "resizable=yes,chrome=yes,dialog=no", this.bookmarks || [],
-                   this.newBookmarks || []);
+
+        var wmediator = Components.classes["@mozilla.org/appshell/window-mediator;1"].
+            getService(Components.interfaces.nsIWindowMediator);
+
+        var win = wmediator.getMostRecentWindow("ow:bookmarks");
+
+        if (!win)
+          openDialog("chrome://oneweb/content/bookmarks.xul", "_blank",
+                     "resizable=yes,chrome=yes,dialog=no", this.bookmarks || [],
+                     this.newBookmarks || []);
+        else
+          win.focus();
+
         this.cleanCallback();
       },
 
