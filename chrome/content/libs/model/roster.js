@@ -368,7 +368,7 @@ _DECL_(Contact, null, Model, Comparator, DiscoItem).prototype =
 
         return this.visibleName == c.visibleName ? 0 :
             this.visibleName > c.visibleName ? 1 : -1;
-    },
+    }
 }
 
 function Resource(jid, contact)
@@ -452,7 +452,7 @@ _DECL_(Resource, null, Model, DiscoItem, Comparator).prototype =
     cmp: function(c)
     {
         return this.presence.cmp(c.presence, true);
-    },
+    }
 }
 
 function MyResourcesContact(jid)
