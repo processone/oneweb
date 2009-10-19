@@ -485,6 +485,7 @@ _DECL_(MyResourcesContact, Contact).prototype =
     {
         this.groups[0]._onContactRemoved(this);
         delete account.myResources[this.jid.normalizedJID];
+        account.modelUpdated("resources", {removed: [this]})
     },
 
     _updateNick: function(nickname)
