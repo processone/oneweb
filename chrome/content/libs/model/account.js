@@ -189,9 +189,12 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         jid = new JID(jid);
 
         if (!showResource)
-            jid = jid.shortJID;
+            jid = jid.shortJIDObject;
 
         var name = this.getContactOrResource(jid);
+        if (!name && this.myResource.jid.normalizedJID.shortJID == jid.normalizedJID.shortJID)
+            return account.myResource.visibleName;
+
         return name ? name.visibleName : jid.toUserString();
     },
 
