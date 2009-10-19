@@ -108,6 +108,14 @@ JID.prototype =
         return this.userLongJID;
     },
 
+    /**
+     * Returns JID object created from shortJID
+     * @public
+     */
+    get shortJIDObject() {
+        return new JID(this.node, this.domain);
+    },
+
     _unescape: function(str) {
         var me = this;
         return str.replace(/\\([a-f0-9]{2})/g, function(f,p) {
