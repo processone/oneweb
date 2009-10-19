@@ -65,8 +65,13 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
             this._bs.insertBookmark(this._bs.unfiledBookmarksFolder, uri, -1, title);
 
         this._ts.tagURI(uri, ["public"]);
+    },
 
-        return;
+    unsharePage: function(url) {
+        this._trace(arguments);
+        var uri = this._ios.newURI(url, null, null);
+
+        this._ts.untagURI(uri, ["public"]);
     },
 
     resetNewBookmarks: function() {
@@ -190,7 +195,7 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
 
         if (state == 1)
             account.setGlobalMessage("bookmarkShared",
-                                     _("Shared bookmark set"),
+                                     _("Shared bookmark added"),
                                      300, 1500);
         else if (state == 2)
             account.setGlobalMessage("bookmarkUnshared",

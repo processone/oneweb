@@ -80,8 +80,9 @@
       },
 
       handleEvent: function() {
-        document.getElementById("oneweb-share-page").hidden =
-          this.service.pageIsShared(gContextMenu.target.ownerDocument.location.href);
+        var shared = this.service.pageIsShared(gContextMenu.target.ownerDocument.location.href);
+        document.getElementById("oneweb-share-page").hidden = shared;
+        document.getElementById("oneweb-unshare-page").hidden = !shared;
       },
 
       login: function() {
@@ -100,6 +101,14 @@
         var doc = gContextMenu.target.ownerDocument;
 
         this.service.sharePage(doc.location.href, doc.title);
+      },
+
+      unsharePage: function() {
+        this.service.unsharePage(gContextMenu.target.ownerDocument.location.href);
+      },
+
+      executeCommand: function(jid, cmd) {
+        this.service.executeCommand(jid, cmd);
       }
     }
   ]]></script>
@@ -126,8 +135,10 @@
       <menuseparator/>
       <menuitem id="oneweb-preferences" label="Preferences..." oncommand="OneWeb.prefs()"/>
     </menupopup>
+
     <popup id="contentAreaContextMenu">
       <menuitem id="oneweb-share-page" label="Share this page" oncommand="OneWeb.sharePage()"/>
+      <menuitem id="oneweb-unshare-page" label="Stop sharing this page" oncommand="OneWeb.unsharePage()"/>
     </popup>
   </popupset>
 

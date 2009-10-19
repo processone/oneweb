@@ -66,6 +66,10 @@ var uiUpdater = {
 
         sharePage: function(url, title) {
             bookmarksSharing.sharePage(url, title);
+        },
+
+        unsharePage: function(url) {
+            bookmarksSharing.unsharePage(url);
         }
     },
 
