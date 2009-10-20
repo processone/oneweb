@@ -4,8 +4,8 @@ var uiUpdater = {
     _trace: function(args) {
         var name = "(unknown)";
 
-        for (var i in bookmarksSharing)
-            if (bookmarksSharing[i] == args.callee) {
+        for (var i in this)
+            if (this[i] == args.callee) {
                 name = i;
                 break;
             }
@@ -23,13 +23,13 @@ var uiUpdater = {
             var doc = win.document;
             var el = doc.getElementById("oneweb-status");
 
-            dump(win+", "+doc+", "+el+"\n")
             if (el)
                 yield [win, doc, el];
         }
     },
 
     observe: function(subject, topic, data) {
+        this._trace(arguments);
         if (topic != "domwindowopened")
             return;
 
