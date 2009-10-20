@@ -135,7 +135,9 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
             } else
                 date = new Date(date);
 
-            this.foreignBookmarks[jid][data.added[i].@id] = [label, date];
+            var fb = this.foreignBookmarks[jid][data.added[i].@id];
+            if (!fb || fb[0] != label)
+                this.foreignBookmarks[jid][data.added[i].@id] = [label, date];
 
             if (!this.newBookmarks[jid])
                 this.newBookmarks[jid] = {};
