@@ -82,11 +82,18 @@ var uiUpdater = {
     handleEvent: function(event) {
         if (event.type != "load")
             return;
+
         event.target.removeEventListener("load", this, false);
 
         var el = event.target.getElementById("oneweb-status");
         if (!el)
             return;
+
+        if (this._showPrefs)
+            account.showPrefs();
+
+        this._firstWindowOpened = true;
+        this._showPrefs = false;
 
         var ow = event.target.defaultView.OneWeb;
 
@@ -227,6 +234,7 @@ var uiUpdater = {
     },
 
     _tryConnect: function(showPrefs) {
+        this._trace(arguments);
         var ci = account.connectionInfo;
 
         if (ci.host && ci.user && ci.pass) {
@@ -235,8 +243,12 @@ var uiUpdater = {
             return true;
         }
 
-        if (showPrefs)
-            account.showPrefs();
+        if (showPrefs) {
+            if (this._firstWindowOpened)
+                account.showPrefs();
+            else
+                this._showPrefs = true;
+        }
 
         return false;
     },
