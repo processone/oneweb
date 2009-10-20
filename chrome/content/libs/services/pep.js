@@ -51,7 +51,7 @@ _DECL_(PEPNodeHandler).prototype = {
 
     reconfigureNode: function(delta, callback) {
         servicesManager.sendIqWithGenerator(
-            (function (delta) {
+            (function (delta, callback) {
                 var fields = [];
 
                 delta["FORM_TYPE"] = "http://jabber.org/protocol/pubsub#node_config";
@@ -65,11 +65,35 @@ _DECL_(PEPNodeHandler).prototype = {
                                    [["x", {xmlns: "jabber:x:data", type: "submit"}, fields]]]]]
                 };
 
-                if (callback)
-                    callback(pkt.getType() == "result");
+                if (callback) {
+                    var error = pkt.getChild(null, "urn:ietf:params:xml:ns:xmpp-stanzas");
+                    var type = pkt.getType() == "result" ? null : error ? error.nodeName : "unknown";
+                    callback(type);
+                }
 
                 yield null;
-            }).call(this, delta));
+            }).apply(this, arguments));
+    },
+
+    deleteNode: function(callback) {
+        servicesManager.sendIqWithGenerator(
+            (function (callback) {
+                var fields = [];
+
+                [pkt, query, queryDOM] = yield {
+                    type: "set",
+                    domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
+                                 [["delete", {node: this._node},[]]]]
+                };
+
+                if (callback) {
+                    var error = pkt.getChild(null, "urn:ietf:params:xml:ns:xmpp-stanzas");
+                    var type = pkt.getType() == "result" ? null : error ? error.nodeName : "unknown";
+                    callback(type);
+                }
+
+                yield null;
+            }).apply(this, arguments));
     },
 
     destroy: function() {
@@ -82,22 +106,23 @@ _DECL_(PEPNodeHandler).prototype = {
 
     createNode: function(callback, configuration) {
         servicesManager.sendIqWithGenerator(
-            (function (configuration) {
+            (function (callback, configuration) {
                 var fields = [];
 
-                configuration["FORM_TYPE"] = "http://jabber.org/protocol/pubsub#node_config";
-                for (var v in configuration)
-                    fields.push(["field", {"var": v}, [["value", {}, [configuration[v]]]]]);
+                if (configuration) {
+                    configuration["FORM_TYPE"] = "http://jabber.org/protocol/pubsub#node_config";
+                    for (var v in configuration)
+                        fields.push(["field", {"var": v}, [["value", {}, [configuration[v]]]]]);
+                }
 
-                var form = fields.length == 1 ? [] :
-                    ["x", {xmlns: "jabber:x:data", type: "submit"}, fields];
+                var create = [["create", {node: this._node}, []]];
+                if (fields.length > 1)
+                    create.push(["x", {xmlns: "jabber:x:data", type: "submit"}, fields]);
 
-                [pkt, query, queryDOM] = yield {
+                var [pkt, query, queryDOM] = yield {
                     type: "set",
                     domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
-                                 [["create", {node: this._node}, []]
-                                  ["configure", {},
-                                   [form]]]]
+                                 create]
                 };
 
                 if (callback) {
@@ -107,45 +132,45 @@ _DECL_(PEPNodeHandler).prototype = {
                 }
 
                 yield null;
-            }).call(this, delta));
+            }).apply(this, arguments));
         return null;
     },
 
-    publishItem: function(id, data, dontSend) {
+    publishItem: function(id, data, dontSend, callback) {
         var pkt = new JSJaCIQ();
         var ns = "http://jabber.org/protocol/pubsub"
 
-        pkt.setType('set');
+        pkt.setType("set");
 
         pkt.appendNode("pubsub", {xmlns: ns},
                        [["publish", {node: this._node},
                          [["item", id ? {id: id} : {}, data]]]]);
 
         if (!dontSend)
-            account.connection.send(pkt);
+            account.connection.send(pkt, callback);
 
         return pkt;
     },
 
-    retractItem: function(id, dontSend) {
+    retractItem: function(id, dontSend, callback) {
         var pkt = new JSJaCIQ();
         var ns = "http://jabber.org/protocol/pubsub"
 
-        pkt.setType('set');
+        pkt.setType("set");
 
         pkt.appendNode("pubsub", {xmlns: ns},
                        [["retract", {node: this._node},
                          [["item", {id: id}, []]]]]);
 
         if (!dontSend)
-            account.connection.send(pkt);
+            account.connection.send(pkt, callback);
 
         return pkt;
     },
 
     getItems: function(to, callback, maxItems) {
         servicesManager.sendIqWithGenerator(
-            (function (callback) {
+            (function (to, callback, maxItems) {
                 [pkt, query, queryDOM] = yield {
                     type: "get",
                     to: to,
@@ -154,20 +179,23 @@ _DECL_(PEPNodeHandler).prototype = {
                                                        {node: this._node}]]]
                 };
 
-                var res = [];
+                var res = [], error;
                 if (pkt.getType() == "result") {
                     var ns = new Namespace("http://jabber.org/protocol/pubsub");
                     dump ("GOT getItems: "+query+"\n");
 
                     for each (var item in query.ns::items.ns::item)
                         res.push(item);
+                } else {
+                    error = pkt.getChild(null, "urn:ietf:params:xml:ns:xmpp-stanzas");
+                    error = error ? error.nodeName : "unknown";
                 }
 
                 if (callback)
-                    callback(to, res);
+                    callback(to, res, error);
 
                 yield null;
-            }).call(this, callback));
+            }).apply(this, arguments));
     }
 }
 
