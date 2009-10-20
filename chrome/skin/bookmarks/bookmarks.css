@@ -16,9 +16,10 @@ ul {
 }
 
 li {
-  margin: 0 0 0 1em;
+  margin: 0 0 0 2em;
   padding: 0;
   list-style: none;
+  text-indent: -1em;
 }
 
 :link {
