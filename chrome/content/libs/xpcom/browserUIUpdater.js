@@ -15,10 +15,6 @@ var uiUpdater = {
     windows: function() {
         var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].
             getService(Components.interfaces.nsIWindowMediator);
-        var ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"].
-            getService(Components.interfaces.nsIWindowWatcher);
-
-        ww.registerNotification(this);
 
         var br = wm.getEnumerator("navigator:browser");
 
@@ -246,6 +242,9 @@ var uiUpdater = {
     },
 
     init: function() {
+        var ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"].
+            getService(Components.interfaces.nsIWindowWatcher);
+
         ML.importMod("model/account.js");
 
         account.registerView(this.onGlobalMessageChanged, this, "globalMessage");
@@ -256,6 +255,8 @@ var uiUpdater = {
         bookmarksSharing.registerView(this.onNewBookmarkChanged, this, "foreignBookmarks");
 
         bookmarksSynchronising._init();
+
+        ww.registerNotification(this);
 
         if (!this._tryConnect(true))
             account.registerView(new Callback(this._tryConnect, this).addArgs(false), null,
