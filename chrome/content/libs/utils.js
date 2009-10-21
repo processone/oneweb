@@ -5,7 +5,8 @@ var EXPORTED_SYMBOLS = ["E4XtoDOM", "DOMtoE4X", "ppFileSize", "ppTimeInterval",
                         "Comparator", "NotificationsCanceler", "xmlEscape",
                         "unescapeJS", "generateRandomName", "generateUniqueId",
                         "recoverSetters", "perlSplit", "evalInWindow",
-                        "enumerateMatchingProps", "report", "Animator"];
+                        "enumerateMatchingProps", "report", "compareArrays",
+                        "Animator"];
 
 ML.importMod("roles.js");
 
@@ -843,6 +844,26 @@ function report(to, level, info, context)
 // #endif
         throw new Error("Error while trying to reporting error, unrecognized receiver type: " + to);
     }
+}
+
+function compareArrays(a, b) {
+    a=a.sort();
+    b=b.sort();
+
+    var inA = [], inBoth = [], inB = [];
+    var ai = 0; bi = 0;
+
+    while (ai < a.length || bi < b.length) {
+        if (bi >= b.length || a[ai] < b[bi])
+            inA.push(a[ai++]);
+        else if (ai >= a.length || a[ai] > b[bi])
+            inB.push(b[bi++]);
+        else {
+            inBoth.push(a[ai++]);
+            bi++;
+        }
+    }
+    return [inA, inBoth, inB];
 }
 
 var Animator = {
