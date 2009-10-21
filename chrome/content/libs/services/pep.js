@@ -23,7 +23,7 @@ _DECL_(PEPNodeHandler).prototype = {
 
         servicesManager.sendIqWithGenerator(
             (function (callback) {
-                [pkt, query, queryDOM] = yield {
+                var [pkt, query, queryDOM] = yield {
                     type: "get",
                     domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
                                  [["configure", {node: this._node}]]]
@@ -58,7 +58,7 @@ _DECL_(PEPNodeHandler).prototype = {
                 for (var v in delta)
                     fields.push(["field", {"var": v}, [["value", {}, [delta[v]]]]]);
 
-                [pkt, query, queryDOM] = yield {
+                var [pkt, query, queryDOM] = yield {
                     type: "set",
                     domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
                                  [["configure", {node: this._node},
@@ -80,7 +80,7 @@ _DECL_(PEPNodeHandler).prototype = {
             (function (callback) {
                 var fields = [];
 
-                [pkt, query, queryDOM] = yield {
+                var [pkt, query, queryDOM] = yield {
                     type: "set",
                     domBuilder: ["pubsub", {xmlns: "http://jabber.org/protocol/pubsub#owner"},
                                  [["delete", {node: this._node},[]]]]
