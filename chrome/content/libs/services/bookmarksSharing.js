@@ -12,22 +12,6 @@ function BookmarksSharing() {
         getService(Components.interfaces.nsIIOService);
 
     this.init();
-
-    this._bs.addObserver(this, false);
-
-    var arr = this._ts.getURIsForTag("public");
-    for (var i = 0; i < arr.length; i++) {
-        var bookmarks = this._bs.getBookmarkIdsForURI(arr[i], {});
-        for (var j = 0; j < bookmarks.length; j++) {
-            var title = this._bs.getItemTitle(bookmarks[j]);
-
-            this._bookmarksIds[bookmarks[j]] = [arr[i].spec, title];
-            if (!(arr[i].spec in this._bookmarks) || title)
-                this._bookmarks[arr[i].spec] = title;
-        }
-    }
-    this._pepHandler = pepService.handlePEPNode("http://oneteam.im/bookmarksSharing",
-                                                new Callback(this._onPEPEvent, this));
 }
 _DECL_(BookmarksSharing, null, Model).prototype = {
     _trace: function(args) {
@@ -160,6 +144,28 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
 
     _gotItems: function(from, items) {
         this._onPEPEvent(from, null, {added: items, removed: []});
+    },
+
+    _init: function() {
+        return;
+        if (!prefManager.getPref("oneweb.general.bookmarksSharing.enabled"))
+            return;
+
+        this._bs.addObserver(this, false);
+
+        var arr = this._ts.getURIsForTag("public");
+        for (var i = 0; i < arr.length; i++) {
+            var bookmarks = this._bs.getBookmarkIdsForURI(arr[i], {});
+            for (var j = 0; j < bookmarks.length; j++) {
+                var title = this._bs.getItemTitle(bookmarks[j]);
+
+                this._bookmarksIds[bookmarks[j]] = [arr[i].spec, title];
+                if (!(arr[i].spec in this._bookmarks) || title)
+                    this._bookmarks[arr[i].spec] = title;
+            }
+        }
+        this._pepHandler = pepService.handlePEPNode("http://oneteam.im/bookmarksSharing",
+                                                    new Callback(this._onPEPEvent, this));
     },
 
     // nsINavBookmarkObserver implemenetation
