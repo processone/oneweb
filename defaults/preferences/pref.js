@@ -4,4 +4,5 @@ pref("oneweb.connection.type", "native");
 pref("oneweb.permissions.openedtabs", 0);
 pref("oneweb.permissions.openurl", 0);
 pref("oneweb.permissions.searchbookmarks", 0);
-
+pref("oneweb.general.bookmarksSync.enabled", false);
+pref("oneweb.general.bookmarksSharing.enabled", true);

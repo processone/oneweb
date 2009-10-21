@@ -15,6 +15,7 @@ ML.importMod("services/manager.js");
 ML.importMod("services/adhoc.js");
 ML.importMod("services/pep.js");
 ML.importMod("services/bookmarksSharing.js");
+ML.importMod("services/bookmarksSynchronising.js");
 
 var XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 var HTMLNS = "http://www.w3.org/1999/xhtml";

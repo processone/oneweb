@@ -263,6 +263,8 @@ var uiUpdater = {
         account.registerView(this.onConnectedChanged, this, "connected");
         account.registerView(this.onResourcesChanged, this, "resources");
 
+        bookmarksSharing._init();
+
         bookmarksSharing.registerView(this.onNewBookmarkChanged, this, "newBookmarks");
         bookmarksSharing.registerView(this.onNewBookmarkChanged, this, "foreignBookmarks");
 
