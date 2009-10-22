@@ -266,7 +266,7 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         this._trace(arguments);
 
         if (property == "title") {
-            if (!itemId in this._bookmarksIds)
+            if (!(itemId in this._bookmarksIds))
                 return;
 
             this._bookmarksIds[itemId] = [this._updateBookmark(itemId, newValue, true), newValue];
@@ -275,7 +275,7 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
         }
 
         if (property == "uri") {
-            if (!itemId in this._bookmarksIds)
+            if (!(itemId in this._bookmarksIds))
                 return;
 
             this._modified[this._bookmarksIds[itemId][0]] = 1;
