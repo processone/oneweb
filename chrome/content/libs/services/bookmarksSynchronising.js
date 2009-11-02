@@ -705,7 +705,7 @@ _DECL_(BookmarksSynchronising, null, Model).prototype = {
         }, new Callback(this._onNodeConfigured, this));
     },
 
-    _onNodeConfigured: function(type) {
+    _onNodeConfigured: function(type, pkt) {
         this._trace(arguments);
 
         if (type) {

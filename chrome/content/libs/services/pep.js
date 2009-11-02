@@ -68,7 +68,7 @@ _DECL_(PEPNodeHandler).prototype = {
                 if (callback) {
                     var error = pkt.getChild(null, "urn:ietf:params:xml:ns:xmpp-stanzas");
                     var type = pkt.getType() == "result" ? null : error ? error.nodeName : "unknown";
-                    callback(type);
+                    callback(type, pkt);
                 }
 
                 yield null;
