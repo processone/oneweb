@@ -709,6 +709,9 @@ _DECL_(BookmarksSynchronising, null, Model).prototype = {
         this._trace(arguments);
 
         if (type) {
+            account.setGlobalMessage("syncDisabled",
+                                     _("Bookmarks synchronisation disabled"),
+                                     300, 5000);
             this._bmh.destroy();
             _bs.removeObserver(this);
             this.unactive = true;
