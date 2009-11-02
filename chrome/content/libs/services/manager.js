@@ -112,19 +112,22 @@ _DECL_(ServicesManager).prototype =
     },
 
     unpublishDiscoInfo: function(ns, nodes) {
-        nodes = nodes instanceof Array ? nodes : nodes == null ? [] : [nodes];
+        nodes = nodes instanceof Array ? nodes : nodes == null ? [""] : [nodes];
 
         if (nodes.length == 0)
             nodes[0] = "";
 
-        for (i = 0; i < nodes.length; i++) {
-            var node = this._nodes[nodes[i]];
-            if (!node) continue;
+        for (var i = 0; i < nodes.length; i++) {
+            var idx, node = this._nodes[nodes[i]];
+            if (!node)
+                continue;
 
-            var idx = node.indexOf(ns);
-            if (idx < 0) continue;
-                node.splice(idx, 1);
-            if (!node.length)
+            if ((idx = node.indexOf(ns)) < 0)
+                continue;
+
+            node.splice(idx, 1);
+
+            if (node.length == 0)
                 delete this._nodes[nodes[i]];
         }
         if (this._initialPresenceSent)
