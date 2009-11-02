@@ -686,9 +686,8 @@ _DECL_(BookmarksSynchronising, null, Model).prototype = {
 
             dump("QUEUE SEND: "+size+", "+this._pktsQueue.length+"\n")
 
-            account.connection.send(this._pktsQueue[0], this._configSent ? null :
-                                    new Callback(this._configureNode, this));
-            this._pktsQueue.shift();
+            account.connection.send(this._pktsQueue.shift(), this._configSent ?
+                                    null : new Callback(this._configureNode, this));
             sent += size;
 
             if (!this._configSent)
