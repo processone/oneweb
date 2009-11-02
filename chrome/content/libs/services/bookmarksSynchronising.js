@@ -653,7 +653,9 @@ _DECL_(BookmarksSynchronising, null, Model).prototype = {
 
             _bs.addObserver(this, false);
         } else
-            _bs.removeObserver(this);
+            try {
+                _bs.removeObserver(this);
+            } catch (ex) {}
     },
 
     _onBookmarkEvent: function(from, node, data, pkt) {
