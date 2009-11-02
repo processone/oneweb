@@ -696,10 +696,11 @@ _DECL_(BookmarksSynchronising, null, Model).prototype = {
     },
 
     _configureNode: function () {
+        this._configSent = 1;
         this._bmh.reconfigureNode({
             "pubsub#persist_items": 1,
             "pubsub#notify_retract": 1,
-            "pubsub#max_items": 100,
+            "pubsub#max_items": 1000,
             "pubsub#access_model": "whitelist"
         }, new Callback(this._onNodeConfigured, this));
     },
