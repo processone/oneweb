@@ -147,7 +147,6 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
     },
 
     _init: function() {
-        return;
         if (!prefManager.getPref("oneweb.general.bookmarksSharing.enabled"))
             return;
 
@@ -239,7 +238,7 @@ _DECL_(BookmarksSharing, null, Model).prototype = {
 
     _updateBookmark: function(bm, newTitle, onlyUpdate) {
         var uri = typeof(bm) == "number" ? this._bs.getBookmarkURI(bm).spec :
-            bm.spec || bm;
+                bm.spec || bm;
 
         if (!this._bookmarks[uri]) {
             if (onlyUpdate)
