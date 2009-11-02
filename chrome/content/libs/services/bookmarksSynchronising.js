@@ -713,8 +713,15 @@ _DECL_(BookmarksSynchronising, null, Model).prototype = {
                                      _("Bookmarks synchronisation disabled"),
                                      300, 5000);
             this._bmh.destroy();
+            this._bmh.deleteNode();
             _bs.removeObserver(this);
             this.unactive = true;
+
+            this.__lastChangeStamp = 0;
+            this._lastChangeStamp = 1;
+
+            this._pktsQueue = [];
+
             return;
         }
         this._configSent = 2;
