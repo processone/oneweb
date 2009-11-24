@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneTeam 1.0\n"
-"POT-Creation-Date: 2009-11-24 11:21+0100\n"
+"POT-Creation-Date: 2009-11-24 11:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9,4 +9,16 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 "Plural-Forms: nplurals=2; plural=n==1 ? 0 : 1;\n"
+
+msgid ""
+msgstr "Project-Id-Version: OneTeam 1.0
+POT-Creation-Date: 2009-11-24 11:21+0100
+PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE
+Last-Translator: FULL NAME <EMAIL@ADDRESS>
+Language-Team: LANGUAGE <LL@li.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=CHARSET
+Content-Transfer-Encoding: ENCODING
+Plural-Forms: nplurals=2; plural=n==1 ? 0 : 1;
+"
 
