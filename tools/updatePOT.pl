@@ -11,6 +11,7 @@ use lib ("$FindBin::Bin/perl5lib", "$FindBin::Bin/perl5lib/3rdparty");
 
 use OneTeam::L10N::InputFile;
 use OneTeam::L10N::POFile;
+use OneTeam::Utils;
 
 chdir($FindBin::RealBin);
 
