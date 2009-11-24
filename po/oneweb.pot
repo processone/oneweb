@@ -1,0 +1,338 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: OneTeam 1.0\n"
+"POT-Creation-Date: 2009-11-24 11:21+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Plural-Forms: nplurals=2; plural=n==1 ? 0 : 1;\n"
+
+#: ../chrome/content/preferences.xul:9
+msgid "OneWeb Preferences"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:107
+msgid "Connection"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:108
+msgid "Services"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:119
+msgid "Jabber ID:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:26
+#: ../chrome/content/preferences.xul:126
+msgid "Password:"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:130
+msgid "Password can't be empty"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:140
+msgid "Allow executing 'Get all opened tabs\\' only by:"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:143
+#: ../chrome/content/preferences.xul:152
+#: ../chrome/content/preferences.xul:161
+msgid "My other clients"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:144
+#: ../chrome/content/preferences.xul:153
+#: ../chrome/content/preferences.xul:162
+msgid "My contacts"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:145
+#: ../chrome/content/preferences.xul:154
+#: ../chrome/content/preferences.xul:163
+msgid "Everyone"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:149
+msgid "Allow executing 'Open URL in new tab\\' only by:"
+msgstr ""
+
+#: ../chrome/content/preferences.xul:158
+msgid "Allow executing 'Search bookmarks\\' only by:"
+msgstr ""
+
+#: ../chrome/content/adhoc.xul:12
+msgid "Ad-Hoc Commands"
+msgstr ""
+
+#: ../chrome/content/adhoc.xul:222
+msgid "Requesting remote commands descriptions"
+msgstr ""
+
+#: ../chrome/content/adhoc.xul:228
+msgid "List of available commands:"
+msgstr ""
+
+#: ../chrome/content/adhoc.xul:231
+msgid "No commands available"
+msgstr ""
+
+#: ../chrome/content/adhoc.xul:239
+msgid "Requesting command form"
+msgstr ""
+
+#: ../chrome/content/bookmarks.xul:8
+msgid "Shared Bookmarks"
+msgstr ""
+
+#: ../chrome/content/bookmarks.xul:58
+msgid "New Bookmarks"
+msgstr ""
+
+#: ../chrome/content/bookmarks.xul:59
+msgid "All Bookmarks"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:18
+msgid "Username:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:182
+#: ../chrome/content/bindings/forms.xml:22
+msgid "Nick:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:30
+msgid "Name:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:174
+#: ../chrome/content/bindings/forms.xml:34
+msgid "First Name:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:178
+#: ../chrome/content/bindings/forms.xml:38
+msgid "Last Name:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:186
+#: ../chrome/content/bindings/forms.xml:42
+msgid "Email:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:46
+msgid "Address:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:50
+msgid "City:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:54
+msgid "State:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:58
+msgid "ZIP:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:62
+msgid "Phone:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:66
+msgid "URL:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:70
+msgid "Date:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:74
+msgid "Misc:"
+msgstr ""
+
+#: ../chrome/content/bindings/forms.xml:78
+msgid "Text:"
+msgstr ""
+
+#: ../chrome/content/overlays/macMenuOverlay.xul:22
+#: ../chrome/content/overlays/macMenuOverlay.xul:99
+msgid "Close"
+msgstr ""
+
+#: ../chrome/content/overlays/macMenuOverlay.xul:125
+#: ../chrome/content/overlays/macMenuOverlay.xul:42
+msgid "File"
+msgstr ""
+
+#: ../chrome/content/overlays/macMenuOverlay.xul:102
+msgid "Close Tab"
+msgstr ""
+
+#: ../chrome/content/libs/xmppsocket.js:261
+msgid "Hasn't been verified by recognized authority"
+msgstr ""
+
+#: ../chrome/content/libs/xmppsocket.js:265
+msgid "Belongs to different domain"
+msgstr ""
+
+#: ../chrome/content/libs/xmppsocket.js:269
+msgid "Has been expired"
+msgstr ""
+
+#: ../chrome/content/libs/xmppsocket.js:274
+msgid "Invalid certificate"
+msgstr ""
+
+#: ../chrome/content/libs/xmppsocket.js:275
+msgid "Certificate used by server is invalid because:"
+msgstr ""
+
+#: ../chrome/content/libs/xmppsocket.js:276
+msgid "Continue"
+msgstr ""
+
+#: ../chrome/content/libs/xmppsocket.js:277
+msgid "Always skip this dialog"
+msgstr ""
+
+#: ../chrome/content/libs/filetransfer.js:89
+msgid "<b>{0}</b> want to send you file"
+msgstr ""
+
+#: ../chrome/content/libs/filetransfer.js:172
+msgid "{0}/sec"
+msgstr ""
+
+#: ../chrome/content/libs/filetransfer.js:173
+msgid "Unknown time remaining"
+msgstr ""
+
+#: ../chrome/content/libs/filetransfer.js:174
+msgid "A few seconds remaining"
+msgstr ""
+
+#: ../chrome/content/libs/filetransfer.js:175
+msgid "{0} remaining"
+msgstr ""
+
+#: ../chrome/content/libs/utils.js:54
+msgid "{0} bytes"
+msgstr ""
+
+#: ../chrome/content/libs/utils.js:70
+msgid "{0} {0, plurals, day, days}, {1} {1, plurals, hour, hours}"
+msgstr ""
+
+#: ../chrome/content/libs/utils.js:72
+msgid "{0} {0, plurals, hour, hours}, {1} {1, plurals, minute, minutes}"
+msgstr ""
+
+#: ../chrome/content/libs/utils.js:74
+msgid "{0} {0, plurals, minute, minutes}, {1} {1, plurals, second, seconds}"
+msgstr ""
+
+#: ../chrome/content/libs/utils.js:76
+msgid "{0} {0, plurals, second, seconds}"
+msgstr ""
+
+#: ../chrome/content/libs/xpcom/browserUIUpdater.js:169
+msgid "Command returned an error"
+msgstr ""
+
+#: ../chrome/content/libs/xpcom/browserUIUpdater.js:177
+msgid "Command executed successfully"
+msgstr ""
+
+#: ../chrome/content/libs/xpcom/browserUIUpdater.js:221
+msgid "You received {0} new {0, plurals, bookmark, bookmarks}"
+msgstr ""
+
+#: ../chrome/content/libs/services/bookmarksSynchronising.js:714
+msgid "Bookmarks synchronisation disabled"
+msgstr ""
+
+#: ../chrome/content/libs/services/bookmarksSharing.js:206
+msgid "Shared bookmark added"
+msgstr ""
+
+#: ../chrome/content/libs/services/bookmarksSharing.js:210
+msgid "Shared bookmark removed"
+msgstr ""
+
+#: ../chrome/content/libs/model/account.js:35
+msgid "Contacts"
+msgstr ""
+
+#: ../chrome/content/libs/model/account.js:36
+msgid "Not in roster"
+msgstr ""
+
+#: ../chrome/content/libs/model/account.js:37
+msgid "My other resources"
+msgstr ""
+
+#: ../chrome/content/libs/model/account.js:493
+#: ../chrome/content/libs/model/account.js:68
+msgid "Logged Out"
+msgstr ""
+
+#: ../chrome/content/libs/model/account.js:419
+msgid "Logging In"
+msgstr ""
+
+#: ../chrome/content/libs/model/account.js:446
+msgid "OneWeb"
+msgstr ""
+
+#: ../chrome/content/libs/model/account.js:491
+msgid "Loggin Error"
+msgstr ""
+
+#: ../chrome/content/libs/model/roster.js:493
+msgid "{0}/{1}"
+msgstr ""
+
+#: ../chrome/content/libs/model/roster.js:494
+msgid "{0} ({1})"
+msgstr ""
+
+#: ../chrome/content/libs/model/roster.js:521
+msgid "(Anonymous)"
+msgstr ""
+
+#: ../chrome/content/libs/model/presence.js:93
+msgid "Available"
+msgstr ""
+
+#: ../chrome/content/libs/model/presence.js:94
+msgid "Available for chat"
+msgstr ""
+
+#: ../chrome/content/libs/model/presence.js:95
+msgid "Busy"
+msgstr ""
+
+#: ../chrome/content/libs/model/presence.js:96
+msgid "Away"
+msgstr ""
+
+#: ../chrome/content/libs/model/presence.js:97
+msgid "Not available"
+msgstr ""
+
+#: ../chrome/content/libs/model/presence.js:98
+msgid "Offline"
+msgstr ""
+
+#: ../chrome/content/libs/model/presence.js:99
+msgid "Invisible"
+msgstr ""
+
