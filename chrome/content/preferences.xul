@@ -43,7 +43,7 @@
 
 <?xul-overlay href="chrome://oneweb/content/overlays/macMenuOverlay.xul"?>
 
-<dialog id="preferences" windowtype="ow:preferences" title="OneWeb Preferences"
+<dialog id="preferences" windowtype="ow:preferences" title="_('OneWeb Preferences')"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
   xmlns:html="http://www.w3.org/1999/xhtml"
   buttons="accept,cancel" onload="onLoad()" ondialogaccept="return savePrefs()">
@@ -141,8 +141,8 @@
 
   <tabbox flex="1" class="chromeclass-toolbar">
     <tabs  style="-moz-appearance: -moz-mac-unified-toolbar;">
-      <tab id="connection" label="Connection"/>
-      <tab id="status" label="Services"/>
+      <tab id="connection" label="_('Connection')"/>
+      <tab id="status" label="_('Services')"/>
     </tabs>
     <tabpanels flex="1">
       <tabpanel>
@@ -153,18 +153,18 @@
           </columns>
           <rows>
             <row>
-              <label value="Jabber ID:"/>
+              <label value="_('Jabber ID:')"/>
               <textbox type="verifiable"
                        regex="^[^ \t\n&quot;&amp;&apos;/:&lt;&gt;@]+@(?:\w(?:[\w-]*\w)?\.)*[^\W\d](?:[\w-]*\w)?$"
                        prefSet="this.value = account.myJID ? account.myJID.shortJID : ''"
                        prefGet="account.setUserAndPass(this.value, document.getElementById('pass').value, true)"/>
             </row>
             <row>
-              <label value="Password:"/>
+              <label value="_('Password:')"/>
               <textbox id="pass"
                        type="verifiable" internaltype="password"
                        regex="."
-                       errortext="Password can't be empty"
+                       errortext="_('Password can\'t be empty')"
                        prefSet="this.value = account.connectionInfo.pass || ''"
                        prefGet=""/>
             </row>
@@ -174,30 +174,30 @@
 
       <tabpanel orient="vertical">
         <groupbox>
-          <caption label="Allow executing 'Get all opened tabs' only by:"/>
+          <caption label="_('Allow executing \'Get all opened tabs\' only by:')"/>
           <radiogroup orient="horizontal"
                       pref="oneweb.permissions.openedtabs=selectedIndex">
-            <radio value="0" label="My other clients"/>
-            <radio value="1" label="My contacts"/>
-            <radio value="2" label="Everyone"/>
+            <radio value="0" label="_('My other clients')"/>
+            <radio value="1" label="_('My contacts')"/>
+            <radio value="2" label="_('Everyone')"/>
           </radiogroup>
         </groupbox>
         <groupbox>
-          <caption label="Allow executing 'Open URL in new tab' only by:"/>
+          <caption label="_('Allow executing \'Open URL in new tab\' only by:')"/>
           <radiogroup orient="horizontal"
                       pref="oneweb.permissions.openurl=selectedIndex">
-            <radio value="0" label="My other clients"/>
-            <radio value="1" label="My contacts"/>
-            <radio value="2" label="Everyone"/>
+            <radio value="0" label="_('My other clients')"/>
+            <radio value="1" label="_('My contacts')"/>
+            <radio value="2" label="_('Everyone')"/>
           </radiogroup>
         </groupbox>
         <groupbox>
-          <caption label="Allow executing 'Search bookmarks' only by:"/>
+          <caption label="_('Allow executing \'Search bookmarks\' only by:')"/>
           <radiogroup orient="horizontal"
                       pref="oneweb.permissions.searchbookmarks=selectedIndex">
-            <radio value="0" label="My other clients"/>
-            <radio value="1" label="My contacts"/>
-            <radio value="2" label="Everyone"/>
+            <radio value="0" label="_('My other clients')"/>
+            <radio value="1" label="_('My contacts')"/>
+            <radio value="2" label="_('Everyone')"/>
           </radiogroup>
         </groupbox>
       </tabpanel>

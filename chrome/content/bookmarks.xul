@@ -41,7 +41,7 @@
 
 <?xul-overlay href="chrome://oneteam/content/overlays/macMenuOverlay.xul"?>
 
-<window id="ow:bookmarks" title="Shared Bookmarks" width="700" height="600"
+<window id="ow:bookmarks" title="_('Shared Bookmarks')" width="700" height="600"
     onload="onLoad()" windowtype="ow:bookmarks"
     xmlns:html="http://www.w3.org/1999/xhtml"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -91,8 +91,8 @@
 
   <tabbox flex="1" id="tabbox">
     <tabs style="-moz-appearance: -moz-mac-unified-toolbar;">
-      <tab id="connection" label="New Bookmarks"/>
-      <tab id="status" label="All Bookmarks"/>
+      <tab id="connection" label="_('New Bookmarks')"/>
+      <tab id="status" label="_('All Bookmarks')"/>
     </tabs>
     <tabpanels flex="1">
       <tabpanel flex="1">
