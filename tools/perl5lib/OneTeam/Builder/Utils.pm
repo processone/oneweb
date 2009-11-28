@@ -56,10 +56,12 @@ sub get_version {
     my $gitdir = catdir($topdir, '.git');
     $gitdir = $topdir if not -d $gitdir;
 
-    my $verstr = `git --git-dir="$gitdir" describe HEAD`;
+    my $verstr = `git --git-dir="$gitdir" describe HEAD 2>/dev/null`;
 
-    $verstr =~ /^v([^-]+)(?:-(\d+))?/;
-    $version = $2 ? "$1.$2" : $1;
+    $version = "1.0";
+    if ($verstr =~ /^v([^-]+)(?:-(\d+))?/) {
+        $version = $2 ? "$1.$2" : $1;
+    }
 
     return $version
 }
@@ -72,8 +74,8 @@ sub get_branch {
     my $gitdir = catdir($topdir, '.git');
     $gitdir = $topdir if not -d $gitdir;
 
-    $branch = `git name-rev HEAD`;
-    $branch = "UNKNOWN" if not $branch =~ s/HEAD\s+(.*?)\s*$/$1/;
+    $branch = `git --git-dir "$gitdir" name-rev HEAD 2>/dev/null`;
+    $branch = "master" if not $branch =~ s/HEAD\s+(.*?)\s*$/$1/;
 
     return $branch
 }
