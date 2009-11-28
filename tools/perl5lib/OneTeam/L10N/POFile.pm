@@ -67,7 +67,7 @@ has 'headers' => (
     isa => 'ArrayRef',
     default => sub {
         return [
-            ['Project-Id-Version' => 'OneTeam 1.0'],
+            ['Project-Id-Version' => 'OneWeb 1.0'],
             ['POT-Creation-Date' => POSIX::strftime("%Y-%m-%d %H:%M%z", localtime)],
             ['PO-Revision-Date' => 'YEAR-MO-DA HO:MI+ZONE'],
             ['Last-Translator' => 'FULL NAME <EMAIL@ADDRESS>'],

@@ -37,13 +37,13 @@
    - ***** END LICENSE BLOCK ***** -->
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://oneteam/skin/dialog.css" type="text/css"?>
-<?xml-stylesheet href="chrome://oneteam/skin/main/main.css" type="text/css"?>
-<?xml-stylesheet href="chrome://oneteam/skin/dataforms/dataforms.css" type="text/css"?>
-<?xml-stylesheet href="chrome://oneteam/content/bindings/bindings.css" type="text/css"?>
-<?xml-stylesheet href="chrome://oneteam-branding/locale/branding.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneweb/skin/dialog.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneweb/skin/main/main.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneweb/skin/dataforms/dataforms.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneweb/content/bindings/bindings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://oneweb-branding/locale/branding.css" type="text/css"?>
 
-<?xul-overlay href="chrome://oneteam/content/overlays/macMenuOverlay.xul"?>
+<?xul-overlay href="chrome://oneweb/content/overlays/macMenuOverlay.xul"?>
 
 <wizard id="adhoc" windowtype="ot:adhoc" title="_('Ad-Hoc Commands')"
     onwizardfinish="return true" onwizardcancel="return onWizardCancel()"
