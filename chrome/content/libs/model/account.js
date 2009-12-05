@@ -101,7 +101,7 @@ function Account()
             this.modelUpdated("connectionInfo");
         }
     }
-    this.loginStateMsgToken = this.setGlobalMessage("loggetout", _("Logged Out"), 10);
+    this.loginStateMsgToken = this.setGlobalMessage("loggedout", _("Logged Out"), 10);
 }
 
 _DECL_(Account, null, Model, DiscoItem).prototype =
