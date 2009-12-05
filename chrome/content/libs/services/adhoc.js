@@ -33,6 +33,7 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+var EXPORTED_SYMBOLS = ["AdhocSession"];
 
 var adhocCmdsSessions = {};
 var adhocCmds = {
@@ -311,3 +312,101 @@ servicesManager.addMessageService("http://oneweb.im/command", function(pkt, node
 
     return 2;
 });
+
+function AdhocSession(jid, command, listener) {
+    this.jid = new JID(jid);
+    this.command = command;
+    this.listener = listener;
+
+    this._sendCommand("execute");
+}
+
+_DECL_(AdhocSession).prototype =
+{
+    isFinished: false,
+    canGoForward: true,
+    canGoBack: false,
+
+    goForward: function(data) {
+        this._sendCommand(null, data);
+    },
+
+    goBack: function() {
+        this._sendCommand("prev");
+    },
+
+    abort: function() {
+        if (this.sessionid && !this.isFinished)
+            this._sendCommand("cancel");
+
+        this.isFinished = true;
+        this.aborted = true;
+    },
+
+    _sendCommand: function(action, extraData) {
+        var iq = new JSJaCIQ();
+        iq.setIQ(this.jid, "set", this.id);
+
+        var attrs = {
+            xmlns: "http://jabber.org/protocol/commands",
+            node: this.command
+        };
+
+        if (action)
+            attrs.action = action;
+
+        if (this.sessionid)
+            attrs.sessionid = this.sessionid;
+
+        dump("EXTRA DATA:"+uneval(extraData)+"\n");
+
+        iq.appendNode("command", attrs, extraData == null ? [] : [extraData]);
+
+        account.connection.send(iq, new Callback(this._onCommandResult, this));
+    },
+
+    _onCommandResult: function(pkt) {
+        if (this.aborted)
+            return;
+
+        if (pkt.getType() != "result") {
+            this.isFinished = true;
+            this.canGoForward = this.canGoBack = false;
+
+            this.listener.onAdhocError(this);
+
+            return;
+        }
+        var cmd = DOMtoE4X(pkt.getNode().getElementsByTagName("command")[0]);
+
+        const xns = new Namespace("jabber:x:data");
+        const cns = new Namespace("http://jabber.org/protocol/commands");
+
+        if (cmd.@status == "executing") {
+            this.sessionid = cmd.@sessionid.toString();
+            this.id = pkt.getID();
+        }
+        var actions = cmd.cns::actions;
+
+        //workaround for bug in older oneweb
+        if (actions.length() == 0)
+            actions = cmd.cns::action;
+
+        this.canGoBack = actions.cns::prev.length() > 0;
+        this.canGoForward = actions.cns::next.length() > 0 ||
+            actions.cns::complete.length() > 0;
+
+        if (cmd.@status == "canceled" && this.aborted != 2) {
+            this.aborted = true;
+            return;
+        }
+        var notes = [note.text().toString() for each (note in cmd.cns::note)];
+        var xdata = cmd.xns::x;
+
+        if (cmd.@status == "completed") {
+            this.isFinished = true;
+            this.listener.onAdhocCompleted(this, notes, xdata);
+        } else
+            this.listener.onAdhocStep(this, notes, xdata);
+    }
+}
