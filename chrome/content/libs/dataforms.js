@@ -76,6 +76,7 @@ function generateXULFromDataForm(data, doc)
         switch (field.@type.toString()) {
             case "boolean":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 row.appendChild(doc.createElementNS(XULNS, "box"));
 
                 el = doc.createElementNS(XULNS, "checkbox");
@@ -116,6 +117,7 @@ function generateXULFromDataForm(data, doc)
                 break;
             case "jid-multi":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 el = doc.createElementNS(XULNS, "label");
                 el.setAttribute("class", "data-form-field-label");
                 el.setAttribute("value", field.@label);
@@ -137,6 +139,7 @@ function generateXULFromDataForm(data, doc)
                 break;
             case "jid-single":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 el = doc.createElementNS(XULNS, "label");
                 el.setAttribute("class", "data-form-field-label");
                 el.setAttribute("value", field.@label);
@@ -158,6 +161,7 @@ function generateXULFromDataForm(data, doc)
                 break;
             case "list-multi":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 el = doc.createElementNS(XULNS, "label");
                 el.setAttribute("class", "data-form-field-label");
                 el.setAttribute("value", field.@label);
@@ -184,6 +188,7 @@ function generateXULFromDataForm(data, doc)
                 break;
             case "list-single":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 el = doc.createElementNS(XULNS, "label");
                 el.setAttribute("class", "data-form-field-label");
                 el.setAttribute("value", field.@label);
@@ -211,6 +216,7 @@ function generateXULFromDataForm(data, doc)
                 break;
             case "text-multi":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 el = doc.createElementNS(XULNS, "label");
                 el.setAttribute("class", "data-form-field-label");
                 el.setAttribute("value", field.@label);
@@ -230,6 +236,7 @@ function generateXULFromDataForm(data, doc)
                 break;
             case "text-private":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 el = doc.createElementNS(XULNS, "label");
                 el.setAttribute("class", "data-form-field-label");
                 el.setAttribute("value", field.@label);
@@ -249,6 +256,7 @@ function generateXULFromDataForm(data, doc)
                 break;
             case "text-single":
                 row = doc.createElementNS(XULNS, "row");
+                row.setAttribute("align", "center");
                 el = doc.createElementNS(XULNS, "label");
                 el.setAttribute("class", "data-form-field-label");
                 el.setAttribute("value", field.@label);
