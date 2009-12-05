@@ -153,7 +153,10 @@ function openLink(uri)
     browser = wm.getMostRecentWindow("navigator:browser");
 
     if (browser) {
-        browser.getBrowser().addTab(uri, null, null);
+        if (browser.BrowserUI)
+            browser.BrowserUI.newTab(uri, true);
+        else
+            browser.getBrowser().addTab(uri, null, null);
         return false;
     }
 

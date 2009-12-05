@@ -1,0 +1,39 @@
+#oneweb-show-panel {
+  list-style-image: url(imgs/default-icon-64.png);
+}
+
+#oneweb-show-panel:hover:active {
+  list-style-image: url(imgs/default-icon-active-64.png) !important;
+}
+
+#oneweb-show-panel[messageType=logginError] {
+  list-style-image: url(imgs/error-icon-64.png);
+}
+
+#oneweb-show-panel[messageType=newBookmarks] {
+  list-style-image: url(imgs/bookmarks-icon-64.png);
+}
+
+#oneweb-share-page {
+  list-style-image: url(imgs/share-icon-64.png);
+}
+
+#oneweb-share-page:hover:active {
+  list-style-image: url(imgs/share-icon-active-64.png) !important;
+}
+
+#oneweb-share-page[shared=true] {
+  list-style-image: url(imgs/share-icon-shared-64.png);
+}
+
+#oneweb-share-page[shared=true]:hover:active {
+  list-style-image: url(imgs/share-icon-shared-active-64.png) !important;
+}
+
+#oneweb-panel-close {
+  list-style-image: url("chrome://browser/skin/images/task-back-40.png");
+}
+
+#oneweb-bookmarks-list placelabel {
+  background-image: none;
+}

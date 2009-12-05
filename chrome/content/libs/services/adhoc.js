@@ -50,9 +50,11 @@ var adhocCmds = {
                 msgHtml += "<br/>Tabs opened in window "+numWindows+":<br/>";
             }
 
+            var browsers = w.gBrowser ? w.gBrowser.browsers : w.Browser.browsers;
+
             msgHtml += "<ul>"
-            for (var i = 0; i < w.gBrowser.browsers.length; i++) {
-                var b = w.gBrowser.browsers[i];
+            for (var i = 0; i < browsers.length; i++) {
+                var b = browsers[i];
                 msg += "  "+b.contentTitle+" [ "+b.currentURI.spec+" ]\n";
                 msgHtml += "<li><a href=\""+xmlEscape(b.currentURI.spec)+"\">"+
                     xmlEscape(b.contentTitle||"(empty title)")+"</a></li>";
@@ -152,7 +154,7 @@ var adhocCmds = {
             var queryObj = hs.getNewQuery();
 
             options.queryType = options.QUERY_TYPE_BOOKMARKS;
-            queryObj.setFolders([bs.bookmarksMenuFolder], 1);
+            queryObj.setFolders([bs.placesRoot], 1);
             queryObj.searchTerms = terms;
 
             var result = hs.executeQuery(queryObj, options);

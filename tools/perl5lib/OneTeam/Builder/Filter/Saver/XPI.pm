@@ -130,8 +130,18 @@ sub _generate_chrome_manifest {
         for @{$self->{locales}};
     print $fh "locale oneweb-branding $_ jar:${prefix}oneweb.jar!/locale/branding/\n"
         for @{$self->{locales}};
-    print $fh "overlay chrome://browser/content/browser.xul chrome://oneweb/content/overlays/browserOverlay.xul"
+    print $fh "overlay chrome://browser/content/browser.xul ",
+            "chrome://oneweb/content/overlays/browserOverlay.xul ",
+            "application={ec8030f7-c20a-464f-9b0e-13a3a9e97384}\n"
         if $self->_add_browser_overlays;
+    print $fh "overlay chrome://browser/content/browser.xul ",
+            "chrome://oneweb/content/overlays/fennecOverlay.xul ",
+            "application={a23983c0-fd0e-11dc-95ff-0800200c9a66}\n"
+        if $self->_add_browser_overlays;
+    print $fh "override chrome://oneweb/content/preferences.xul ",
+            "chrome://oneweb/content/fennec-preferences.xul ",
+            "application={a23983c0-fd0e-11dc-95ff-0800200c9a66}\n";
+
     close($fh);
 }
 

@@ -48,6 +48,7 @@ var uiUpdater = {
 
         dump(name+"("+Array.join(Array.map(args, uneval), ", ")+")\n");
     },
+
     windows: function() {
         var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].
             getService(Components.interfaces.nsIWindowMediator);
@@ -57,7 +58,7 @@ var uiUpdater = {
         while (br.hasMoreElements()) {
             var win = br.getNext();
             var doc = win.document;
-            var el = doc.getElementById("oneweb-status");
+            var el = doc.getElementById("oneweb-status") || doc.getElementById("oneweb-panel");
 
             if (el)
                 yield [win, doc, el];
@@ -103,7 +104,7 @@ var uiUpdater = {
         },
 
         pageIsShared: function(url) {
-            return bookmarksSharing.pageIsShared(url);
+            return url ? bookmarksSharing.pageIsShared(url) : false;
         },
 
         sharePage: function(url, title) {
@@ -112,21 +113,46 @@ var uiUpdater = {
 
         unsharePage: function(url) {
             bookmarksSharing.unsharePage(url);
+        },
+
+        get jid() {
+            return account.myJID ? account.myJID.shortJID.toString() : '';
+        },
+
+        get password() {
+            return account.connectionInfo.pass;
+        },
+
+        getPref: function(name) {
+            return prefManager.getPref(name);
+        },
+
+        setPref: function(name, value) {
+            prefManager.setPref(name, value);
+        },
+
+        setUserAndPass: function(jid, pass) {
+            dump("SET USER AND PASS: "+jid+", "+pass+"\n");
+            account.setUserAndPass(jid, pass, true);
+        },
+
+        setGlob: function(name, value) {
+            __parent__[name] = value;
         }
     },
 
     handleEvent: function(event) {
         if (event.type != "load")
             return;
-
         event.target.removeEventListener("load", this, false);
 
         var el = event.target.getElementById("oneweb-status");
-        if (!el)
+        if (el) {
+            if (this._showPrefs)
+                account.showPrefs();
+        } else if ((el = event.target.getElementById("oneweb-panel"))) {
+        } else
             return;
-
-        if (this._showPrefs)
-            account.showPrefs();
 
         this._firstWindowOpened = true;
         this._showPrefs = false;
@@ -179,7 +205,7 @@ var uiUpdater = {
 
         if (!account.connected) {
             if (!this.selfDisconnect)
-                setTimeout(this._tryConnect, 5000);
+                setTimeout(function(t){t._tryConnect}, 5000, this);
         } else
             this.selfDisconnect = false;
     },
@@ -269,9 +295,19 @@ var uiUpdater = {
         }
     },
 
+    _tryConnectLazy: function() {
+        if (this._lazyConnectTimeout)
+            clearTimeout(this._lazyConnectTimeout)
+
+        this._lazyConnectTimeout = setTimeout(function(t) {
+            t._tryConnect(false);
+        }, 5000, this);
+    },
+
     _tryConnect: function(showPrefs) {
         this._trace(arguments);
         var ci = account.connectionInfo;
+        showPrefs = false;
 
         if (ci.host && ci.user && ci.pass) {
             if (!account.connected)
@@ -309,7 +345,7 @@ var uiUpdater = {
         ww.registerNotification(this);
 
         if (!this._tryConnect(true))
-            account.registerView(new Callback(this._tryConnect, this).addArgs(false), null,
+            account.registerView(new Callback(this._tryConnectLazy, this).addArgs(false), null,
                                  "connectionInfo");
     }
 }

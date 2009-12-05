@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is OneWeb.
+   -
+   - The Initial Developer of the Original Code is
+   - ProcessOne.
+   - Portions created by the Initial Developer are Copyright (C) 2009
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<?xml-stylesheet href="chrome://oneweb/skin/browserUI/fennecUI.css" type="text/css"?>
+
+<overlay id="onewebBrowserOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script><![CDATA[
+    var OneWeb = {
+      init: function(service) {
+        this.service = service;
+        //window.addEventListener("TabSelect", this, false);
+        //window.addEventListener("URLChanged", this, false); // It's called too early for our purposes
+
+        // HACK, HACK, HACK
+        var oldUS = BrowserUI.updateStar;
+        var _this = this;
+        BrowserUI.updateStar = function() {
+          oldUS.apply(BrowserUI, arguments);
+          _this.handleEvent();
+        }
+      },
+
+      saveAccount: function() {
+        this.service.setUserAndPass(document.getElementById("oneweb-jid").value,
+                                    document.getElementById("oneweb-pass").value);
+      },
+
+      setTextBox: function(el, val) {
+        if (el.input)
+          el.value = val;
+        else
+          el.setAttribute("value", val);
+      },
+
+      fillPrefs: function(el) {
+        this.service.setGlob("topWin", window);
+        var elTmp = el.previousSibling;
+
+        while (elTmp && elTmp.id.indexOf("oneweb-") == 0) {
+          if (elTmp.firstChild && elTmp.firstChild.localName == "menulist")
+            elTmp.firstChild.value = this.service.getPref(elTmp.firstChild.getAttribute("pref"))
+          else if (elTmp.id == "oneweb-pass")
+            this.setTextBox(elTmp, this.service.password || "");
+          else if (elTmp.id == "oneweb-jid")
+            this.setTextBox(elTmp, this.service.jid || "");
+
+          elTmp = elTmp.previousSibling;
+        }
+
+        el.parentNode.removeChild(el);
+      },
+
+      updatePrefs: function(name, value) {
+        this.service.setPref(name, value);
+      },
+
+      panels: [],
+
+      showPanel: function(id) {
+        var panel = {
+          _panel: document.getElementById(id),
+          close: function() {
+            this._panel.hidden = true;
+            BrowserUI.popDialog();
+          }
+        };
+        panel._panel.width = window.innerWidth;
+        panel._panel.height = window.innerHeight;
+        panel._panel.hidden = false;
+        this.panels.push(panel);
+        BrowserUI.pushDialog(panel);
+      },
+
+      onStatusClick: function(event) {
+        if (event.button != 0)
+          return;
+
+        var wmediator = Components.classes["@mozilla.org/appshell/window-mediator;1"].
+            getService(Components.interfaces.nsIWindowMediator);
+
+        var win = wmediator.getMostRecentWindow("ow:bookmarks");
+
+        if (!win)
+          openDialog("chrome://oneweb/content/bookmarks.xul", "_blank",
+                     "resizable=yes,chrome=yes,dialog=no", this.bookmarks || [],
+                     this.newBookmarks || []);
+        else
+          win.focus();
+
+        this.cleanCallback();
+      },
+
+      onBookmarksChanged: function(bookmarks, newBookmarks, numNew, cleanCallback) {
+        this.bookmarks = bookmarks || [];
+        this.newBookmarks = newBookmarks || [];
+        this.cleanCallback = cleanCallback;
+
+        document.getElementById("oneweb-show-new-bookmarks").disabled =
+          this.newBookmarks.length == 0;
+        document.getElementById("oneweb-show-all-bookmarks").disabled =
+          this.bookmarks.length == 0;
+      },
+
+      onGlobalMessageChanged: function(data) {
+        document.getElementById("oneweb-show-panel").
+          setAttribute("messageType", data ? data.type : "");
+
+        if (data && (data.type == "loggedin" || data.type == "loggedout" ||
+                     data.type == "logginError"))
+        {
+          document.getElementById("oneweb-connection-status").textContent =
+            "Connection Status: "+(this.service.connected ? "Connected" : "Disconnected");
+
+          document.getElementById("oneweb-connect").hidden = !!this.service.connected;
+          document.getElementById("oneweb-disconnect").hidden = !this.service.connected;
+        }
+
+        document.getElementById("oneweb-current-message").textContent =
+          data && data.type != "loggedin" ? data.message || "" : "";
+      },
+
+      handleEvent: function(event) {
+        var shared = this.service.pageIsShared(Browser.selectedBrowser.currentURI.spec);
+        document.getElementById("oneweb-share-page").setAttribute("shared", !!shared);
+      },
+
+      prefs: function() {
+        this.service.showPrefs();
+      },
+
+      shareUnsharePage: function() {
+        var url = Browser.selectedBrowser.currentURI.spec;
+        var shared = this.service.pageIsShared(url);
+        if (shared)
+          this.service.unsharePage(url);
+        else
+          this.service.sharePage(url);
+
+        document.getElementById("oneweb-share-page").setAttribute("shared", !shared);
+      },
+
+      login: function() {
+          this.service.login();
+      },
+
+      logout: function() {
+          this.service.logout();
+      },
+
+      executeCommand: function(jid, cmd) {
+        this.service.executeCommand(jid, cmd);
+      },
+
+      openBookmark: function(uri) {
+        while(panel = this.panels.pop())
+          panel.close();
+
+        BrowserUI.newTab(uri, true);
+      },
+
+      showBookmarks: function(list) {
+        const XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+        var listEl = document.getElementById("oneweb-bookmarks-list");
+        while (listEl._children.firstChild)
+          listEl._children.removeChild(listEl._children.firstChild);
+
+        for (var i = 0; i < list.length; i++) {
+          var folder = document.createElementNS(XULNS, "placelabel");
+          folder.setAttribute("class", "bookmark-item");
+          folder.setAttribute("type", "folder");
+          folder.setAttribute("title", "Bookmarks from "+list[i].from);
+          folder.setAttribute("tags", []);
+
+          listEl._children.appendChild(folder);
+          for (var j = 0; j < list[i].bookmarks.length; j++) {
+            var b = list[i].bookmarks[j];
+            var child = document.createElementNS(XULNS, "placeitem");
+            child.setAttribute("class", "bookmark-item");
+            child.setAttribute("title", b.title);
+            child.setAttribute("uri", b.url);
+            child.setAttribute("tags", []);
+            child.addEventListener("click", function(event){OneWeb.openBookmark(event.target.uri)}, false);
+            child.uri = b.url
+
+            listEl._children.appendChild(child);
+          }
+        }
+        this.showPanel("oneweb-bookmarks")
+        if (list == this.newBookmarks)
+          this.cleanCallback();
+      }
+    }
+  ]]></script>
+
+  <stack id="stack">
+    <vbox id="oneweb-panel" class="panel-dark" hidden="true">
+      <hbox>
+        <description flex="1">OneWeb Panel</description>
+        <toolbarbutton id="oneweb-panel-close" class="urlbar-button button-image"
+                       command="cmd_close"/>
+      </hbox>
+      <vbox>
+        <description id="oneweb-current-message"/>
+        <spacer height="20"/>
+        <button id="oneweb-show-new-bookmarks" class="button-dark"
+                label="Show new received bookmarks" disabled="true"
+                oncommand="OneWeb.showBookmarks(OneWeb.newBookmarks||[])"/>
+        <button id="oneweb-show-all-bookmarks" class="button-dark"
+                label="Show all received bookmarks" disabled="true"
+                oncommand="OneWeb.showBookmarks(OneWeb.bookmarks||[])"/>
+        <spacer height="20"/>
+        <button class="button-dark" label="Execute remote command" oncommand="OneWeb.doExecuteCommand()"/>
+        <spacer height="20"/>
+        <hbox align="center">
+          <description id="oneweb-connection-status" flex="1">Connection Status: Disconnected</description>
+          <button id="oneweb-connect" class="button-dark" label="Connect" oncommand="OneWeb.login()"/>
+          <button id="oneweb-disconnect" class="button-dark" hidden="true" label="Disconnect" oncommand="OneWeb.logout()"/>
+        </hbox>
+      </vbox>
+    </vbox>
+    <vbox id="oneweb-bookmarks" class="panel-dark" hidden="true">
+      <hbox>
+        <description flex="1">Received Bookmarks</description>
+        <toolbarbutton id="oneweb-panel-close" class="urlbar-button button-image"
+                       command="cmd_close"/>
+      </hbox>
+      <placelist id="oneweb-bookmarks-list"/>
+    </vbox>
+  </stack>
+
+  <vbox id="browser-controls">
+    <toolbarbutton id="oneweb-share-page" class="browser-control-button button-image"
+                   oncommand="OneWeb.shareUnsharePage()" label="Share page"
+                   insertafter="tool-star"/>
+  </vbox>
+
+  <hbox id="tabs-controls">
+    <toolbarbutton id="oneweb-show-panel" class="button-image" oncommand="OneWeb.showPanel('oneweb-panel')"/>
+  </hbox>
+
+</overlay>
