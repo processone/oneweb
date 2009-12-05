@@ -106,25 +106,10 @@
         panel._panel.hidden = false;
         this.panels.push(panel);
         BrowserUI.pushDialog(panel);
-      },
 
-      onStatusClick: function(event) {
-        if (event.button != 0)
-          return;
 
-        var wmediator = Components.classes["@mozilla.org/appshell/window-mediator;1"].
-            getService(Components.interfaces.nsIWindowMediator);
 
-        var win = wmediator.getMostRecentWindow("ow:bookmarks");
 
-        if (!win)
-          openDialog("chrome://oneweb/content/bookmarks.xul", "_blank",
-                     "resizable=yes,chrome=yes,dialog=no", this.bookmarks || [],
-                     this.newBookmarks || []);
-        else
-          win.focus();
-
-        this.cleanCallback();
       },
 
       onBookmarksChanged: function(bookmarks, newBookmarks, numNew, cleanCallback) {
