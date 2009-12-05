@@ -520,13 +520,7 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
     {
         this.resetGlobalMessage(this.loginStateMsgToken);
 
-        // If "disconnect" event is received before "connect", it
-        // means that we attempted connection but did not manage
-        // to.
-        if(!this.connected)
-            this.loginStateMsgToken = this.setGlobalMessage("logginError", _("Loggin Error"), 300);
-        else
-            this.loginStateMsgToken = this.setGlobalMessage("loggetout", _("Logged Out"), 10);
+        var wasConnected = this.connected
 
         this.connected = false;
         this.connectionInitialized = false;
@@ -535,6 +529,15 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         this.modelUpdated("account.connection");
         this.modelUpdated("connected");
         this.modelUpdated("connectionInitialized");
+
+        // If "disconnect" event is received before "connect", it
+        // means that we attempted connection but did not manage
+        // to.
+        if(!wasConnected)
+            this.loginStateMsgToken = this.setGlobalMessage("logginError", _("Loggin Error"), 300);
+        else
+            this.loginStateMsgToken = this.setGlobalMessage("loggedout", _("Logged Out"), 10);
+
 
         var groups = this.groups;
 
