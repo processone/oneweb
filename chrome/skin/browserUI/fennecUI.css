@@ -37,3 +37,12 @@
 #oneweb-bookmarks-list placelabel {
   background-image: none;
 }
+
+image.oneweb-throbber {
+  list-style-image: url("chrome://browser/skin/images/throbber.png");
+}
+
+.oneweb-commands > button {
+  margin-left: 2em;
+  margin-right: 2em;
+}

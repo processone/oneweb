@@ -131,6 +131,16 @@
           this.bookmarks.length == 0;
       },
 
+      onCommandsChanged: function() {
+        var disable = true;
+        for (var c in this.service.commands) {
+          disable = false;
+          break;
+        }
+
+        document.getElementById("oneweb-execute-command").disabled = disable;
+      },
+
       onGlobalMessageChanged: function(data) {
         document.getElementById("oneweb-show-panel").
           setAttribute("messageType", data ? data.type : "");
@@ -217,6 +227,131 @@
         this.showPanel("oneweb-bookmarks")
         if (list == this.newBookmarks)
           this.cleanCallback();
+      },
+
+      adhocCommands: function() {
+        var ct = document.getElementById("oneweb-adhoc-content");
+
+        while (ct.firstChild)
+          ct.removeChild(ct.firstChild);
+
+        var c = document.createElement("vbox");
+        c.setAttribute("class", "oneweb-commands");
+
+        for (var jid in this.service.commands) {
+          var item = this.service.commands[jid];
+
+          c.appendChild(document.createElement("description")).textContent =
+            item.name+" commands";
+
+          for (var cmd in item.commands) {
+            var b = document.createElement("button");
+
+            b.setAttribute("label", item.commands[cmd]);
+            b.setAttribute("oncommand", "OneWeb.invokeAdhoc(this.jid, this.command)");
+            b.setAttribute("class", "button-dark");
+
+            b.command = cmd;
+            b.jid = jid;
+
+            c.appendChild(b);
+          }
+        }
+        ct.appendChild(c);
+
+        this.adhocPanel = this.showPanel("oneweb-adhoc");
+      },
+
+      invokeAdhoc: function(jid, command) {
+        this.adhocSession = new this.service.AdhocSession(jid, command, this);
+        this.updateAdhocPanelWait("Requesting command form");
+      },
+
+      adhocAbort: function() {
+        var closeAll = false;
+        if (this.adhocSession) {
+          if (this.adhocSession.isFinished)
+            closeAll = true;
+          this.adhocSession.abort();
+        }
+
+        if (this.adhocPanel) {
+          if (closeAll)
+            this.closeAllPanels();
+          else
+            this.adhocPanel.close();
+        }
+        this.adhocPanel = this.adhocSession = null;
+      },
+
+      adhocNext: function() {
+        this.adhocSession.goForward(this.service.buildResponseDataFormFromXUL(this.adhocForm));
+        this.updateAdhocPanelWait("Requesting command form");
+      },
+
+      adhocPrev: function() {
+        this.adhocSession.goBack();
+        this.updateAdhocPanelWait("Requesting command form");
+      },
+
+      updateAdhocPanel: function(notes, xdata, buttons) {
+        var form;
+        var c = document.getElementById("oneweb-adhoc-content");
+
+        while (c.firstChild)
+          c.removeChild(c.firstChild);
+
+        for (var i = 0; i < notes.length; i++)
+          c.appendChild(document.createElement("description")).textContent = notes[i];
+        if (xdata)
+
+        if (xdata != null)
+          c.appendChild(form = this.service.generateXULFromDataForm(xdata, document));
+
+        buttons = buttons || {};
+        var buttonsNames = ["prev", "next"]
+        for (var i = 0; i < buttonsNames.length; i++)
+          document.getElementById("oneweb-adhoc-button-"+buttonsNames[i]).hidden =
+            !buttons || !buttons[buttonsNames[i]];
+
+        return form;
+      },
+
+      updateAdhocPanelWait: function(message) {
+        var form;
+        var c = document.getElementById("oneweb-adhoc-content");
+
+        while (c.firstChild)
+          c.removeChild(c.firstChild);
+
+        var hbox = document.createElement("hbox");
+        hbox.setAttribute("align", "center")
+
+        hbox.appendChild(document.createElement("image")).
+          setAttribute("class", "oneweb-throbber");
+        hbox.appendChild(document.createElement("description")).textContent =
+          message;
+
+        c.appendChild(hbox);
+
+        document.getElementById("oneweb-adhoc-button-prev").hidden = true;
+        document.getElementById("oneweb-adhoc-button-next").hidden = true;
+      },
+
+      onAdhocStep: function(session, notes, xdata) {
+        this.adhocForm = this.updateAdhocPanel(notes, xdata, {
+          cancel: true,
+          prev: session.canGoBack,
+          next: session.canGoForward});
+      },
+
+      onAdhocCompleted: function(session, notes, xdata) {
+        this.adhocForm = this.updateAdhocPanel(notes, xdata, {finish: true});
+      },
+
+      onAdhocError: function(session) {
+        this.adhocForm = null;
+        this.updateAdhocPanel(["Operation returned error"]);
       }
     }
   ]]></script>
@@ -238,12 +373,15 @@
                 label="Show all received bookmarks" disabled="true"
                 oncommand="OneWeb.showBookmarks(OneWeb.bookmarks||[])"/>
         <spacer height="20"/>
-        <button class="button-dark" label="Execute remote command" oncommand="OneWeb.doExecuteCommand()"/>
+        <button id="oneweb-execute-command" class="button-dark" disabled="true"
+                label="Execute remote command" oncommand="OneWeb.adhocCommands()"/>
         <spacer height="20"/>
         <hbox align="center">
           <description id="oneweb-connection-status" flex="1">Connection Status: Disconnected</description>
-          <button id="oneweb-connect" class="button-dark" label="Connect" oncommand="OneWeb.login()"/>
-          <button id="oneweb-disconnect" class="button-dark" hidden="true" label="Disconnect" oncommand="OneWeb.logout()"/>
+          <button id="oneweb-connect" class="button-dark" label="Connect"
+                  oncommand="OneWeb.login()"/>
+          <button id="oneweb-disconnect" class="button-dark" label="Disconnect"
+                  oncommand="OneWeb.logout()" hidden="true"/>
         </hbox>
       </vbox>
     </vbox>
@@ -254,6 +392,21 @@
                        command="cmd_close"/>
       </hbox>
       <placelist id="oneweb-bookmarks-list"/>
+    </vbox>
+    <vbox id="oneweb-adhoc" class="panel-dark" hidden="true">
+      <hbox>
+        <description flex="1">Remote Command</description>
+        <toolbarbutton id="oneweb-panel-close" class="urlbar-button button-image"
+                       oncommand="OneWeb.adhocAbort()"/>
+      </hbox>
+      <vbox id="oneweb-adhoc-content" class="button-dark" flex="1"/>
+      <hbox>
+        <spacer flex="1"/>
+        <button id="oneweb-adhoc-button-prev" class="button-dark" label="Back"
+                hidden="true" oncommand="OneWeb.adhocPrev()"/>
+        <button id="oneweb-adhoc-button-next" class="button-dark" label="Next"
+                hidden="true" oncommand="OneWeb.adhocNext()"/>
+      </hbox>
     </vbox>
   </stack>
 

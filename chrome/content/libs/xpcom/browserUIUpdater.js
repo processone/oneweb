@@ -36,6 +36,10 @@
 
 var EXPORTED_SYMBOLS = ["uiUpdater"];
 
+ML.importMod("dataforms.js");
+ML.importMod("services/manager.js");
+ML.importMod("services/adhoc.js");
+
 var uiUpdater = {
     _trace: function(args) {
         var name = "(unknown)";
@@ -138,7 +142,11 @@ var uiUpdater = {
 
         setGlob: function(name, value) {
             __parent__[name] = value;
-        }
+        },
+
+        generateXULFromDataForm: generateXULFromDataForm,
+        buildResponseDataFormFromXUL: buildResponseDataFormFromXUL,
+        AdhocSession: AdhocSession
     },
 
     handleEvent: function(event) {
@@ -220,9 +228,21 @@ var uiUpdater = {
                 var di = new DiscoItem(data.added[i].jid, null, "http://jabber.org/protocol/commands");
                 di.getDiscoItems(false, new Callback(this.onDiscoItems, this));
             }
+        var removed = [];
         if (data.removed && data.removed.length)
             for (var i = 0; i < data.removed.length; i++)
-                delete this._service.commands[data.removed[i].jid];
+                if (this._service.commands[data.removed[i].jid]) {
+                    delete this._service.commands[data.removed[i].jid];
+                    removed.push(data.removed[i].jid);
+                }
+
+        if (removed.length)
+            for (data in this.windows()) {
+                var [win, doc, el] = data;
+
+                if (win.OneWeb.onCommandsChanged)
+                    win.OneWeb.onCommandsChanged({added: [], removed: removed})
+            }
     },
 
     onForm: function(pkt) {
@@ -251,6 +271,7 @@ var uiUpdater = {
         if (items.length == 0)
             return;
         var c = this._service.commands[di.discoJID] = {
+            jid: di.discoJID,
             name: account.getContactOrResourceName(di.discoJID),
             commands: {
             }
@@ -258,6 +279,13 @@ var uiUpdater = {
 
         for (var i = 0; i < items.length; i++)
             c.commands[items[i].discoNode] = items[i].discoName;
+
+        for (data in this.windows()) {
+            var [win, doc, el] = data;
+
+            if (win.OneWeb.onCommandsChanged)
+                win.OneWeb.onCommandsChanged({added: [c], removed: []})
+        }
         }catch(ex){dump(ex+"\n")}
     },
 
