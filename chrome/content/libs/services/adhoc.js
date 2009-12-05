@@ -102,9 +102,9 @@ var adhocCmds = {
     "openUrl": ["Open URL in new tab", function(pkt, query) {
         [pkt, query] = yield (
             <command xmlns="http://jabber.org/protocol/commands" status="executing">
-                <action execute="complete">
+                <actions execute="complete">
                     <complete/>
-                </action>
+                </actions>
                 <x xmlns="jabber:x:data" type="form">
                     <instruction>Please enter URL which should be opened in new tab</instruction>
                     <field var="url" label="URL" type="text-single"/>
@@ -129,9 +129,9 @@ var adhocCmds = {
     "searchBookmarks": ["Search bookmarks", function(pkt, query) {
         [pkt, query] = yield (
             <command xmlns="http://jabber.org/protocol/commands" status="executing">
-                <action execute="complete">
+                <actions execute="complete">
                     <complete/>
-                </action>
+                </actions>
                 <x xmlns="jabber:x:data" type="form">
                     <instruction>Please enter term which should be searched in your bookmarks</instruction>
                     <field var="terms" label="Search Term" type="text-single"/>
