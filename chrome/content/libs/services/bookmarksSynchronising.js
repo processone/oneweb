@@ -42,16 +42,22 @@ ML.importMod("exceptions.js");
 ML.importMod("dateutils.js");
 ML.importMod("utils.js");
 
-var _bs = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"].
-    getService(Components.interfaces.nsINavBookmarksService);
-var _ts = Components.classes["@mozilla.org/browser/tagging-service;1"].
-    getService(Components.interfaces.nsITaggingService);
-var _ls = Components.classes["@mozilla.org/browser/livemark-service;2"].
-    getService(Components.interfaces.nsILivemarkService);
-var _hs = Components.classes["@mozilla.org/browser/nav-history-service;1"].
-    getService(Components.interfaces.nsINavHistoryService);
-var _ios = Components.classes["@mozilla.org/network/io-service;1"].
-    getService(Components.interfaces.nsIIOService);
+var _bs, _ts, _ls, _hs, _ios;
+
+try {
+    _ios = Components.classes["@mozilla.org/network/io-service;1"].
+        getService(Components.interfaces.nsIIOService);
+    _bs = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"].
+        getService(Components.interfaces.nsINavBookmarksService);
+    _ts = Components.classes["@mozilla.org/browser/tagging-service;1"].
+        getService(Components.interfaces.nsITaggingService);
+    _ls = Components.classes["@mozilla.org/browser/livemark-service;2"].
+        getService(Components.interfaces.nsILivemarkService);
+    _hs = Components.classes["@mozilla.org/browser/nav-history-service;1"].
+        getService(Components.interfaces.nsINavHistoryService);
+} catch (ex) {
+
+}
 
 var _itemsMap = {};
 var _waitList = {};
