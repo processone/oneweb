@@ -96,7 +96,12 @@
       showPanel: function(id) {
         var panel = {
           _panel: document.getElementById(id),
+          _panels: this.panels,
           close: function() {
+            if (this._panels[this._panels.length-1] != this)
+              return;
+
+            this._panels.pop();
             this._panel.hidden = true;
             BrowserUI.popDialog();
           }
@@ -107,9 +112,12 @@
         this.panels.push(panel);
         BrowserUI.pushDialog(panel);
 
+        return panel;
+      },
 
-
-
+      closeAllPanels: function() {
+        while(this.panels.length)
+          this.panels[this.panels.length-1].close();
       },
 
       onBookmarksChanged: function(bookmarks, newBookmarks, numNew, cleanCallback) {
@@ -174,8 +182,7 @@
       },
 
       openBookmark: function(uri) {
-        while(panel = this.panels.pop())
-          panel.close();
+        this.closeAllPanels();
 
         BrowserUI.newTab(uri, true);
       },
