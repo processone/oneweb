@@ -388,7 +388,7 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         for (var i = 0; i < logins.length; i++)
             lm.removeLogin(logins[i]);
 
-        if (savePass) {
+        if (savePass && pass) {
             var li = Components.classes["@mozilla.org/login-manager/loginInfo;1"].
                 createInstance(Components.interfaces.nsILoginInfo);
 
