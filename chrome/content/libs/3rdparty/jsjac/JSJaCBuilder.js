@@ -44,7 +44,6 @@ var JSJaCBuilder = {
    * @private
    */
   buildNode: function(doc, elementName) {
-
     if (typeof(elementName) == "xml") {
       return E4XtoDOM(elementName, doc);
     } else if (elementName instanceof Node)
@@ -100,11 +99,10 @@ var JSJaCBuilder = {
    * @private
    */
   _children: function(doc, element, children, ns) {
-    if(typeof children=='object') { // array can hold nodes and text
-      for (var i in children) {
-        if (children.hasOwnProperty(i)) {
+    if (typeof children=="object") { // array can hold nodes and text
+      for (var i = 0; i < children.length; i++) {
           var e = children[i];
-          if (typeof e=='object') {
+          if (typeof (e) == "object" || typeof(e) == "xml") {
             if (e instanceof Node) {
               element.appendChild(e);
             } else {
@@ -116,7 +114,6 @@ var JSJaCBuilder = {
               element.appendChild(JSJaCBuilder._text(doc, e));
             }
           }
-        }
       }
     } else {
       if(JSJaCBuilder._isStringOrNumber(children)) {
