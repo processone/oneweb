@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Remote Command Result</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+    </style>
+    <script>
+      function linkEventsRedirector(event)
+      {
+          if (event.target.localName.toLowerCase() != "a" || event.type != "click" ||
+              event.button != 0 && event.button != 1)
+              return;
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          open(event.target.href, "_blank");
+      }
+
+      function onLoad() {
+        var iframe = document.getElementById("iframe");
+        iframe.contentDocument.body.innerHTML = window.data;
+        iframe.style.height = iframe.contentDocument.body.scrollHeight+"px";
+        iframe.contentDocument.addEventListener("click", linkEventsRedirector, true);
+
+      }
+    </script>
+  </head>
+  <body onload="onLoad()">
+    <iframe id="iframe" src="about:blank" target="_blank"></iframe>
+  </body>
+</html>

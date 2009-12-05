@@ -153,14 +153,15 @@ function openLink(uri)
     browser = wm.getMostRecentWindow("navigator:browser");
 
     if (browser) {
-        if (browser.BrowserUI)
-            browser.BrowserUI.newTab(uri, true);
+        if (browser.Browser)
+            return browser.Browser.addTab(uri, true).browser;
         else
-            browser.getBrowser().addTab(uri, null, null);
+            return browser.getBrowser().addTab(uri, null, null).linkedBrowser;
+
         return false;
     }
 
-    open(uri, "_blank");
+    return open(uri, "_blank");
 /*#else
     var ioservice = Components.classes["@mozilla.org/network/io-service;1"]
                     .getService(Components.interfaces.nsIIOService);

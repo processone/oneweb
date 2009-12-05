@@ -293,26 +293,19 @@ servicesManager.addMessageService("http://oneweb.im/command", function(pkt, node
     if (!body)
         return 2;
 
-    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].
-        getService(Components.interfaces.nsIWindowMediator);
-    var browser = wm.getMostRecentWindow("navigator:browser");
-    browser = browser && browser.getBrowser();
-
+    var browser = openLink("chrome://oneweb/content/result.html");
     if (!browser)
         return 2;
 
-    var tab = browser.addTab("chrome://oneweb/content/result.xul", null, null);
-    browser.selectedTab = tab;
-
-    tab.linkedBrowser.addEventListener("load", {
+    browser.addEventListener("load", {
         handleEvent: function(ev) {
             this.browser.removeEventListener("load", this, true);
 
             this.win.data = this.val;
         },
 
-        win: tab.linkedBrowser.contentWindow.wrappedJSObject,
-        browser: tab.linkedBrowser,
+        win: browser.contentWindow.wrappedJSObject,
+        browser: browser,
         val: body.innerHTML
     }, true);
 
