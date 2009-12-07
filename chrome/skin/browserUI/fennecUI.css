@@ -46,3 +46,7 @@ image.oneweb-throbber {
   margin-left: 2em;
   margin-right: 2em;
 }
+
+#oneweb-panel button.button-dark[disabled="true"] {
+  color: #7e7e7e !important;
+}
