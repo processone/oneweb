@@ -69,6 +69,8 @@ sub analyze {
 sub path_convert {
     my ($self, $file, $locale) = @_;
 
+    return undef if $file =~ m!jsjac[\\/](?:AUTHORS|COPYING)!;
+
     return catfile($self->{outputdir}, "chrome", "locale", $1)
         if $file =~ /(?:^|[\\\/])(branding[\\\/].*)/;
 
