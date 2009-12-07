@@ -98,6 +98,8 @@ JSJaCMozillaConnection.prototype = {
   _handleElement: function(node) {
     var packet = JSJaCPacket.wrapNode(node);
 
+    this.oDbg.log("recv: "+(new XMLSerializer()).serializeToString(node),2);
+
     if (packet)
       this._handleEvent("packet_in", packet);
 
