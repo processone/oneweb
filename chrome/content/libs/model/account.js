@@ -491,7 +491,7 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
         if (this._initConnectionState != 1)
             return;
 
-        this.setPresence(new Presence(null, null, -1), true);
+        this.setPresence(new Presence("dnd", null, -1), true);
         this.connectionInitialized = true;
         this.modelUpdated("connectionInitialized");
     },
