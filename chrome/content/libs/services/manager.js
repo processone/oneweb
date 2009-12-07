@@ -414,7 +414,3 @@ servicesManager.addIQService("jabber:iq:version", function (pkt, query) {
 servicesManager.publishDiscoIdentity([""], {category:"client", type:"pc", name:"OneWeb"});
 
 servicesManager.publishDiscoInfo("http://jabber.org/protocol/disco#info");
-servicesManager.publishDiscoInfo("http://jabber.org/protocol/muc");
-servicesManager.publishDiscoInfo("jabber:x:conference");
-servicesManager.publishDiscoInfo("http://jabber.org/protocol/chatstates");
-servicesManager.publishDiscoInfo("http://jabber.org/protocol/xhtml-im");
