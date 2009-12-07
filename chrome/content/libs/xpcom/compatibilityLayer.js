@@ -55,7 +55,7 @@ var _atobMap = {};
 var _btoaMap = [];
 {
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    for (let i = 0; i < 63; i++) {
+    for (let i = 0; i < str.length; i++) {
         _atobMap[str.charAt(i)] = i;
         _btoaMap[i] = str.charAt(i);
     }
@@ -86,7 +86,10 @@ function btoa(data)
     var res = "";
 
     for (var i = 0; i < data.length; i+=3) {
-        let v1 = data.charCodeAt(i), v2 = data.charCodeAt(i+1)||4096, v3 = data.charCodeAt(i+2)||4096;
+        let v1 = data.charCodeAt(i);
+        let v2 = i+1 >= data.length ? 4096 : data.charCodeAt(i+1);
+        let v3 = i+2 >= data.length ? 4096 : data.charCodeAt(i+2);
+
         res += _btoaMap[v1 >> 2] +
             _btoaMap[((v1 << 4) & 63) | ((v2 >> 4) & 63)] +
             (_btoaMap[((v2 << 2) & 0x3f03f) | ((v3 >> 6) & 63)] || "=") +
