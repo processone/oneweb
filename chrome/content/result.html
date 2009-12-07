@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <title>Remote Command Result</title>
+    <title>_('Remote Command Result')</title>
     <style>
       html, body {
         margin: 0;
@@ -15,6 +15,7 @@
         border: 0;
       }
     </style>
+
     <script>
       function linkEventsRedirector(event)
       {
@@ -30,10 +31,17 @@
 
       function onLoad() {
         var iframe = document.getElementById("iframe");
+        var docShell = iframe.contentWindow.
+          QueryInterface(Components.interfaces.nsIInterfaceRequestor).
+          getInterface(Components.interfaces.nsIWebNavigation).
+          QueryInterface(Components.interfaces.nsIDocShell);
+
+        docShell.allowJavascript = false;
+        docShell.allowImages = false;
+
         iframe.contentDocument.body.innerHTML = window.data;
         iframe.style.height = iframe.contentDocument.body.scrollHeight+"px";
         iframe.contentDocument.addEventListener("click", linkEventsRedirector, true);
-
       }
     </script>
   </head>
