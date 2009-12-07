@@ -62,27 +62,37 @@
                                     document.getElementById("oneweb-pass").value);
       },
 
-      setTextBox: function(el, val) {
-        if (el.input)
-          el.value = val;
-        else
-          el.setAttribute("value", val);
+      /*
+       Hack, needed on n900 fennec, looks like widget sometimes is not fully
+       initialized at setting its value prop doesn't work
+      */
+      _setTextBoxes: function(els, loop) {
+        dump("_setTextBoxes loop: "+loop+"\n")
+        for (var i = els.length-1; i >= 0; i--) {
+          if (els[i][0].__lookupSetter__("value")) {
+            els[i][0].value = els[i][1];
+            els.splice(i, 1);
+          }
+        }
+        if (els.length)
+          setTimeout(arguments.callee, 50, els, loop+1);
       },
 
       fillPrefs: function(el) {
-        this.service.setGlob("topWin", window);
         var elTmp = el.previousSibling;
 
+        var els = [];
         while (elTmp && elTmp.id.indexOf("oneweb-") == 0) {
           if (elTmp.firstChild && elTmp.firstChild.localName == "menulist")
             elTmp.firstChild.value = this.service.getPref(elTmp.firstChild.getAttribute("pref"))
           else if (elTmp.id == "oneweb-pass")
-            this.setTextBox(elTmp, this.service.password || "");
+            els.push([elTmp, this.service.password || ""]);
           else if (elTmp.id == "oneweb-jid")
-            this.setTextBox(elTmp, this.service.jid || "");
+            els.push([elTmp, this.service.jid || ""]);
 
           elTmp = elTmp.previousSibling;
         }
+        this._setTextBoxes(els, 0);
 
         el.parentNode.removeChild(el);
       },
