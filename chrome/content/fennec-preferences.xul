@@ -43,12 +43,12 @@
 <?xml-stylesheet href="chrome://oneweb/skin/dialog.css" type="text/css"?>
 
 <box xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <setting id="oneweb-jid" type="string" title="Jabber ID"/>
+  <setting id="oneweb-jid" type="string" title="_('Jabber ID')"/>
 
-  <setting id="oneweb-pass" type="string" inputtype="password" title="Password"/>
+  <setting id="oneweb-pass" type="string" inputtype="password" title="_('Password')"/>
 
-  <setting id="oneweb-connection-save" type="control" title="Save account information">
-    <button label="Save" oncommand="OneWeb.saveAccount()"/>
+  <setting id="oneweb-connection-save" type="control" title="_('Save account information')">
+    <button label="_('Save')" oncommand="OneWeb.saveAccount()"/>
   </setting>
 
   <setting id="oneweb-perm-gettabs" title="_('Get all opened tabs')"
