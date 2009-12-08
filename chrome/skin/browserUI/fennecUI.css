@@ -11,7 +11,7 @@
 }
 
 #oneweb-show-panel[messageType=newBookmarks] {
-  list-style-image: url(imgs/bookmarks-icon-64.png);
+  list-style-image: url(imgs/new-bookmarks-icon-64.png);
 }
 
 #oneweb-share-page {
