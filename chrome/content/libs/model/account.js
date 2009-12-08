@@ -628,7 +628,7 @@ _DECL_(Account, null, Model, DiscoItem).prototype =
     onStatusChanged: function(error) {
         switch(error) {
             case 'session-terminate-conflict':
-            report('user', 'error', 'Conflict (same account/resource signed in from another client)');
+            //report('user', 'error', 'Conflict (same account/resource signed in from another client)');
             break;
         }
     },
