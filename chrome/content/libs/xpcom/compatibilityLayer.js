@@ -229,8 +229,20 @@ var screen = {
 };
 
 var navigator = {
+    get _service() {
+        if (!this.__service)
+            this.__service = Components.classes["@mozilla.org/xre/app-info;1"].
+                getService(Components.interfaces.nsIXULAppInfo).
+                QueryInterface(Components.interfaces.nsIXULRuntime);
+        return this.__service;
+    },
+
     get platform() {
-        return "";
+        return this._service.OS.replace(/Darwin/, "Mac")+" "+this._service.XPCOMABI;
+    },
+
+    get _isFennec() {
+        return this._service.ID == "{a23983c0-fd0e-11dc-95ff-0800200c9a66}";
     }
 }
 

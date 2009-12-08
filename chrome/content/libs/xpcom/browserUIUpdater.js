@@ -94,7 +94,8 @@ var uiUpdater = {
         },
 
         showPrefs: function() {
-            account.showPrefs();
+            if (!navigator._isFennec)
+                account.showPrefs();
         },
 
         executeCommand: function(jid, command) {
@@ -335,7 +336,6 @@ var uiUpdater = {
     _tryConnect: function(showPrefs) {
         this._trace(arguments);
         var ci = account.connectionInfo;
-        showPrefs = false;
 
         if (ci.host && ci.user && ci.pass) {
             if (!account.connected)
