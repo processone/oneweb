@@ -137,12 +137,7 @@ var uiUpdater = {
         },
 
         setUserAndPass: function(jid, pass) {
-            dump("SET USER AND PASS: "+jid+", "+pass+"\n");
             account.setUserAndPass(jid, pass, true);
-        },
-
-        setGlob: function(name, value) {
-            __parent__[name] = value;
         },
 
         generateXULFromDataForm: generateXULFromDataForm,
